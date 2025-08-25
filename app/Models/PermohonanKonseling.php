@@ -14,27 +14,19 @@ class PermohonanKonseling extends Model
         'status',
         'rangkuman',
         'tanggal_disetujui',
-        'tempat'
+        'tempat',
+        'skor_prioritas',
     ];
+
+    protected $table = 'permohonan_konseling';
 
     public function siswa()
     {
-        return $this->belongsTo(Siswa::class);
+        return $this->belongsTo(Siswa::class, 'siswa_id');
     }
 
     public function kategori()
     {
-        return $this->belongsTo(KategoriKonseling::class);
-    }
-
-    public function hitungSkor()
-    {
-        $TU = $this->tingkat_urgensi;
-        $DM = $this->dampak_masalah;
-        $KM = $this->kategori_masalah;
-        $RK = $this->riwayat_konseling;
-
-        $this->skor_prioritas = ($TU * 0.4) + ($DM * 0.3) + ($KM * 0.2) + ($RK * 0.1);
-        $this->save();
+        return $this->belongsTo(KategoriKonseling::class, 'kategori_id');
     }
 }

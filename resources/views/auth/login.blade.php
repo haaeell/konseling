@@ -20,7 +20,7 @@
                 width: 100%;
                 max-width: 500px;
                 padding: 30px;
-                border: 2px solid #000;
+                border: 2px solid #4eaff0;
                 border-radius: 12px;
                 text-align: center;
                 background: #fff;
@@ -29,7 +29,7 @@
             .login-logo {
                 width: 100px;
                 height: 100px;
-                background: #000;
+                background: #4eaff0;
                 color: #fff;
                 border-radius: 50%;
                 display: flex;
@@ -41,11 +41,11 @@
 
             .form-control {
                 border-radius: 10px;
-                box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
+                box-shadow:#4eaff0;
             }
 
             .btn-login {
-                background: #000;
+                background: #4eaff0;
                 color: #fff;
                 border-radius: 10px;
                 width: 100%;
@@ -54,7 +54,7 @@
             }
 
             .btn-login:hover {
-                background: #333;
+                background: #4eaff0;
                 color: #fff;
             }
 
@@ -71,11 +71,11 @@
 
     <body>
         <div class="login-card">
-            <div class="login-logo">
+            <div class="login-logo mb-5">
                 LOGO<br>SMANJA
             </div>
             <h5 class="fw-bold">SISTEM INFORMASI BIMBINGAN KONSELING</h5>
-            <h6 class="fw-bold">(SI-BK)</h6>
+            <h6 class="fw-bold mb-5">(SI-BK)</h6>
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf

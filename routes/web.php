@@ -41,6 +41,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('kategori-konseling', KategoriKonselingController::class);
 
     // Permohonan Konseling
-    Route::get('permohonan-konseling/prioritas', [PermohonanKonselingController::class, 'prioritas'])->name('permohonan.prioritas');
-    Route::resource('permohonan-konseling', PermohonanKonselingController::class);
+    Route::resource('permohonan-konseling', PermohonanKonselingController::class)->only(['index', 'store']);
+    Route::patch('permohonan-konseling/approve/{id}', [PermohonanKonselingController::class, 'approve'])->name('permohonan-konseling.approve');
+    Route::patch('permohonan-konseling/reject/{id}', [PermohonanKonselingController::class, 'reject'])->name('permohonan-konseling.reject');
+    Route::patch('permohonan-konseling/complete/{id}', [PermohonanKonselingController::class, 'complete'])->name('permohonan-konseling.complete');
+
+    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });

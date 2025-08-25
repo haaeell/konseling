@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="{{ asset('../assets') }}/extensions/simple-datatables/style.css">
     <link rel="stylesheet" href="{{ asset('../assets') }}/compiled/css/table-datatable.css">
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
     <link rel="stylesheet" href="{{ asset('../assets') }}/extensions/filepond/filepond.css">
     <link rel="stylesheet"
         href="{{ asset('../assets') }}/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.css">
@@ -34,7 +36,7 @@
                 <div class="sidebar-header position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="logo">
-                            <a href="/"><img src="{{ asset('../assets') }}/img/logo2.png" class="pt-3"
+                            <a href="/"><img src="https://placehold.co/600x400" class="pt-3"
                                     style="max-width: 100px; height: auto;" alt=""></a>
                         </div>
                         <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
@@ -87,49 +89,50 @@
 
                 <div class="d-flex align-items-center gap-3">
 
-                    <!-- Notifications Dropdown -->
                     <div class="dropdown">
                         <a class="nav-link position-relative" href="#" role="button" id="notificationsDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-bell fs-4"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                5
-                                <span class="visually-hidden">unread notifications</span>
-                            </span>
+                            @php
+                                $unreadNotifications = auth()->user()->unreadNotifications()->count();
+                            @endphp
+                            @if ($unreadNotifications > 0)
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ $unreadNotifications }}
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationsDropdown"
                             style="width: 300px; max-height: 400px; overflow-y: auto;">
                             <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                <strong>Notifications</strong>
-                                <button class="btn btn-sm btn-link text-decoration-none">Mark all as read</button>
+                                <strong>Notifikasi</strong>
+                                <form action="{{ route('notifications.markAllAsRead') }}" method="POST"
+                                    style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-link text-decoration-none">Tandai
+                                        semua sebagai dibaca</button>
+                                </form>
                             </div>
                             <div class="list-group list-group-flush">
-                                <a href="#"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="fw-bold">New Message</div>
-                                        <small class="text-muted">You have 1 new message from John</small>
+                                @forelse (auth()->user()->notifications()->latest()->take(10)->get() as $notification)
+                                    <a href="{{ route('permohonan-konseling.index') }}"
+                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-start {{ is_null($notification->read_at) ? 'bg-light' : '' }}">
+                                        <div>
+                                            <div class="fw-bold">Permohonan Konseling</div>
+                                            <small class="text-muted">{{ $notification->data['message'] }}</small>
+                                            <div class="text-muted small">Status:
+                                                {{ ucfirst($notification->data['status']) }}</div>
+                                        </div>
+                                        <small
+                                            class="text-muted">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
+                                    </a>
+                                @empty
+                                    <div class="list-group-item text-center">
+                                        <small class="text-muted">Tidak ada notifikasi</small>
                                     </div>
-                                    <small class="text-muted">2 min ago</small>
-                                </a>
-                                <a href="#"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-start bg-light">
-                                    <div>
-                                        <div class="fw-bold">Server Alert</div>
-                                        <small class="text-muted">CPU usage is high</small>
-                                    </div>
-                                    <small class="text-muted">10 min ago</small>
-                                </a>
-                                <a href="#"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="fw-bold">Order Update</div>
-                                        <small class="text-muted">Order #1234 has been shipped</small>
-                                    </div>
-                                    <small class="text-muted">1 hr ago</small>
-                                </a>
-                                <!-- Tambahkan notifikasi lain disini -->
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -186,14 +189,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2();
-            $('.rupiah').mask("#.##0", {
-                reverse: true
-            });
-        });
-    </script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     @if ($errors->any())
         <script>
@@ -262,9 +258,25 @@
     <script src="{{ asset('../assets') }}/static/js/pages/dashboard.js"></script>
     <script src="{{ asset('../assets') }}/static/js/pages/filepond.js"></script>
 
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+            $('.rupiah').mask("#.##0", {
+                reverse: true
+            });
+            $('#datatable').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                ordering: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
+                }
+            });
+        });
+    </script>
 
-
-    @yield('script')
+    @yield('scripts')
 
 
 </body>
