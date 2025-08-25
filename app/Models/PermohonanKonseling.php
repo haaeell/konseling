@@ -26,4 +26,15 @@ class PermohonanKonseling extends Model
     {
         return $this->belongsTo(KategoriKonseling::class);
     }
+
+    public function hitungSkor()
+    {
+        $TU = $this->tingkat_urgensi;
+        $DM = $this->dampak_masalah;
+        $KM = $this->kategori_masalah;
+        $RK = $this->riwayat_konseling;
+
+        $this->skor_prioritas = ($TU * 0.4) + ($DM * 0.3) + ($KM * 0.2) + ($RK * 0.1);
+        $this->save();
+    }
 }

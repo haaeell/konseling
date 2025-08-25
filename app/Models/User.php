@@ -32,4 +32,34 @@ class User extends Authenticatable
     {
         return $this->hasOne(Orangtua::class);
     }
+
+    public function isSiswa(): bool
+    {
+        return $this->role === 'siswa';
+    }
+
+    public function isOrangTua(): bool
+    {
+        return $this->role === 'orangtua';
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === 'guru';
+    }
+
+    public function isBK(): bool
+    {
+        return $this->isGuru() && $this->guru && $this->guru->role_guru === 'bk';
+    }
+
+    public function isWaliKelas(): bool
+    {
+        return $this->isGuru() && $this->guru && !is_null($this->guru->kelas_id);
+    }
+
+    public function isKepalaSekolah(): bool
+    {
+        return $this->isGuru() && $this->guru && $this->guru->role_guru === 'kepsek';
+    }
 }

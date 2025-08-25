@@ -16,6 +16,7 @@ class Guru extends Model
         'role_guru',
         'kelas_id'
     ];
+    protected $table = 'guru';
 
     public function user()
     {

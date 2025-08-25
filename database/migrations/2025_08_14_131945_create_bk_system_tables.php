@@ -83,6 +83,11 @@ return new class extends Migration
             $table->text('rangkuman')->nullable();
             $table->date('tanggal_disetujui')->nullable();
             $table->string('tempat')->nullable();
+            $table->unsignedTinyInteger('tingkat_urgensi')->default(0); // TU
+            $table->unsignedTinyInteger('dampak_masalah')->default(0);  // DM
+            $table->unsignedTinyInteger('kategori_masalah')->default(0); // KM
+            $table->unsignedTinyInteger('riwayat_konseling')->default(0); // RK
+            $table->float('skor_prioritas')->default(0);
             $table->timestamps();
         });
 

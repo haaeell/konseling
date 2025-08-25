@@ -17,6 +17,8 @@ class Siswa extends Model
         'alamat'
     ];
 
+    protected $table = 'siswa';
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -24,7 +26,7 @@ class Siswa extends Model
 
     public function orangtua()
     {
-        return $this->hasMany(Orangtua::class);
+        return $this->hasOne(Orangtua::class, 'siswa_id');
     }
 
     public function kelas()

@@ -14,6 +14,7 @@ class Orangtua extends Model
         'alamat',
         'siswa_id'
     ];
+    protected $table = 'orangtua';
 
     public function user()
     {
