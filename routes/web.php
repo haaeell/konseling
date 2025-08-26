@@ -2,13 +2,16 @@
 
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JadwalKonselingController;
 use App\Http\Controllers\KategoriKonselingController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\OrangtuaController;
 use App\Http\Controllers\PermohonanKonselingController;
+use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('orangtua', OrangtuaController::class);
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/jadwal-konseling', [JadwalKonselingController::class, 'index']);
+    Route::get('/riwayat-konseling', [RiwayatController::class, 'index']);
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::post('/users/{user}/update', [UserController::class, 'update'])->name('users.update');
     Route::post('/users/{user}/delete', [UserController::class, 'destroy'])->name('users.destroy');

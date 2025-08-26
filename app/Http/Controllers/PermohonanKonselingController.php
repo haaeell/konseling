@@ -10,11 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
+use App\Models\User;
+
 class PermohonanKonselingController extends Controller
 {
     public function index()
     {
         $permohonanKonseling = PermohonanKonseling::with(['siswa.user', 'kategori'])
+        ->where('status', 'menunggu')
             ->orderBy('skor_prioritas', 'desc')
             ->orderBy('created_at', 'asc')
             ->get();
@@ -26,7 +29,7 @@ class PermohonanKonselingController extends Controller
     {
         // Cek apakah user adalah siswa
         if (Auth::user()->role !== 'siswa') {
-            return redirect()->route('permohonan-konseling.index')->with('error', 'Hanya siswa yang dapat membuat permohonan konseling.');
+            return redirect()->back()->with('error', 'Hanya siswa yang dapat membuat permohonan konseling.');
         }
 
         $request->validate([
@@ -36,10 +39,9 @@ class PermohonanKonselingController extends Controller
         ]);
 
         $kategori = KategoriKonseling::findOrFail($request->kategori_id);
-        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
         $permohonan = PermohonanKonseling::create([
-            'siswa_id' => $siswa->id,
+            'siswa_id' => Auth::user()->id,
             'kategori_id' => $request->kategori_id,
             'tanggal_pengajuan' => $request->tanggal_pengajuan,
             'deskripsi_permasalahan' => $request->deskripsi_permasalahan,
@@ -47,18 +49,23 @@ class PermohonanKonselingController extends Controller
             'skor_prioritas' => $kategori->skor_prioritas,
         ]);
 
-        // Kirim notifikasi ke siswa
-        $user = $siswa->user;
-        Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah dikirim.'));
+        $guruBk = User::whereHas('guru', function($q) {
+        $q->where('role_guru', 'bk');
+    })->get();
 
-        return redirect()->route('permohonan-konseling.index')->with('success', 'Permohonan konseling berhasil diajukan.');
+    $user = Auth::user()->name;
+    foreach ($guruBk as $guru) {
+        $guru->notify(new PermohonanKonselingNotification($permohonan,  `$user mengajukan permohonan konseling.`  ));
+    }
+
+        return redirect()->back()->with('success', 'Permohonan konseling berhasil diajukan.');
     }
 
     public function approve(Request $request, $id)
     {
         // Cek apakah user adalah guru dengan role BK
         if (Auth::user()->role !== 'guru' || !Auth::user()->guru || Auth::user()->guru->role_guru !== 'bk') {
-            return redirect()->route('permohonan-konseling.index')->with('error', 'Hanya guru BK yang dapat menyetujui permohonan.');
+            return redirect()->back()->with('error', 'Hanya guru BK yang dapat menyetujui permohonan.');
         }
 
         $request->validate([
@@ -77,14 +84,14 @@ class PermohonanKonselingController extends Controller
         $user = $permohonan->siswa->user;
         Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah disetujui.'));
 
-        return redirect()->route('permohonan-konseling.index')->with('success', 'Permohonan konseling berhasil disetujui.');
+        return redirect()->back()->with('success', 'Permohonan konseling berhasil disetujui.');
     }
 
     public function reject(Request $request, $id)
     {
         // Cek apakah user adalah guru dengan role BK
         if (Auth::user()->role !== 'guru' || !Auth::user()->guru || Auth::user()->guru->role_guru !== 'bk') {
-            return redirect()->route('permohonan-konseling.index')->with('error', 'Hanya guru BK yang dapat menolak permohonan.');
+            return redirect()->back()->with('error', 'Hanya guru BK yang dapat menolak permohonan.');
         }
 
         $permohonan = PermohonanKonseling::findOrFail($id);
@@ -96,14 +103,14 @@ class PermohonanKonselingController extends Controller
         $user = $permohonan->siswa->user;
         Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah ditolak.'));
 
-        return redirect()->route('permohonan-konseling.index')->with('success', 'Permohonan konseling berhasil ditolak.');
+        return redirect()->back()->with('success', 'Permohonan konseling berhasil ditolak.');
     }
 
     public function complete(Request $request, $id)
     {
         // Cek apakah user adalah guru dengan role BK
         if (Auth::user()->role !== 'guru' || !Auth::user()->guru || Auth::user()->guru->role_guru !== 'bk') {
-            return redirect()->route('permohonan-konseling.index')->with('error', 'Hanya guru BK yang dapat menyelesaikan permohonan.');
+            return redirect()->back()->with('error', 'Hanya guru BK yang dapat menyelesaikan permohonan.');
         }
 
         $request->validate([
@@ -120,6 +127,6 @@ class PermohonanKonselingController extends Controller
         $user = $permohonan->siswa->user;
         Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah selesai.'));
 
-        return redirect()->route('permohonan-konseling.index')->with('success', 'Permohonan konseling telah selesai.');
+        return redirect()->back()->with('success', 'Permohonan konseling telah selesai.');
     }
 }

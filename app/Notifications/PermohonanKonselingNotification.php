@@ -27,8 +27,8 @@ class PermohonanKonselingNotification extends Notification
     public function toDatabase($notifiable)
     {
         return new DatabaseMessage([
-            'permohonan_id' => $this->permohonan->id,
             'message' => $this->message,
+            'permohonan_id' => $this->permohonan->id,
             'status' => $this->permohonan->status,
             'siswa_name' => $this->permohonan->siswa->user->name,
         ]);

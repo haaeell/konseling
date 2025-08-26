@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped" id="datatable">
+                    <table class="table table-bordered table-striped" id="datatablePermohonan">
                         <thead>
                             <tr>
                                 <th>Siswa</th>
@@ -229,7 +229,7 @@
             });
 
             // Inisialisasi DataTables dengan sorting berdasarkan skor_prioritas
-            $('#datatable').DataTable({
+            $('#datatablePermohonanpe').DataTable({
                 order: [[5, 'desc']], // Urutkan berdasarkan kolom skor_prioritas (index 5) secara descending
                 columnDefs: [
                     { orderable: false, targets: -1 } // Nonaktifkan sorting pada kolom aksi
