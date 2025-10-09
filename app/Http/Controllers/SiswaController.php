@@ -8,6 +8,9 @@ use App\Models\User;
 use App\Models\Orangtua;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SiswaImport;
+use App\Exports\SiswaTemplateExport;
 
 class SiswaController extends Controller
 {
@@ -73,6 +76,22 @@ class SiswaController extends Controller
 
         return redirect()->route('siswa.index')->with('success', 'Siswa dan data orangtua berhasil ditambahkan.');
     }
+
+    public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls'
+    ]);
+
+    Excel::import(new SiswaImport, $request->file('file'));
+
+    return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diimport.');
+}
+
+public function downloadTemplate()
+{
+    return Excel::download(new SiswaTemplateExport, 'template_import_siswa.xlsx');
+}
 
     public function update(Request $request, $id)
     {

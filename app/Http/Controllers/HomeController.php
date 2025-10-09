@@ -23,6 +23,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $countSiswa = \App\Models\User::where('role', 'siswa')->count();
+        $countOrtu = \App\Models\User::where('role', 'orangtua')->count();
+        $countGuru = \App\Models\User::where('role', 'guru')->count();
+        $countWalikelas = \App\Models\Guru::where('role_guru', 'walikelas')->count();
+        $countGuruBk = \App\Models\Guru::where('role_guru', 'bk')->count();
+        return view('home', compact('countSiswa', 'countOrtu', 'countGuru', 'countWalikelas', 'countGuruBk'));
     }
 }

@@ -12,7 +12,7 @@
                             <tr>
                                 <th>Siswa</th>
                                 <th>Kategori</th>
-                                <th>Tanggal Pengajuan</th>
+                                <th>Jadwal Konseling</th>
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
                                 <th>Skor Prioritas</th>
@@ -26,7 +26,7 @@
                                 <tr data-id="{{ $jadwal->id }}">
                                     <td>{{ $jadwal->siswa->user->name }}</td>
                                     <td>{{ $jadwal->kategori->nama }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($jadwal->tanggal_pengajuan)->format('d-m-Y') }}</td>
+                                 <td>{{ \Carbon\Carbon::parse($jadwal->tanggal_disetujui)->format('d-m-Y H:i') }}</td>
                                     <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
                                     <td>
                                         <span class="badge

@@ -81,7 +81,7 @@ return new class extends Migration
             $table->text('deskripsi_permasalahan');
             $table->enum('status', ['menunggu', 'disetujui', 'selesai', 'ditolak'])->default('menunggu');
             $table->text('rangkuman')->nullable();
-            $table->date('tanggal_disetujui')->nullable();
+            $table->datetime('tanggal_disetujui')->nullable();
             $table->string('tempat')->nullable();
             $table->float('skor_prioritas')->default(0);
             $table->timestamps();

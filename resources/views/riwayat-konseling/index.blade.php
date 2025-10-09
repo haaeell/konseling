@@ -15,6 +15,7 @@
                                 <th>Tanggal Pengajuan</th>
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
+                                <th>Rangkuman</th>
                                 <th>Skor Prioritas</th>
                             </tr>
                         </thead>
@@ -33,6 +34,7 @@
                                             {{ ucfirst($jadwal->status) }}
                                         </span>
                                     </td>
+                                    <td>{{ Str::limit($jadwal->rangkuman, 50) }}</td>
                                     <td>{{ $jadwal->skor_prioritas }}</td>
 
                                 </tr>

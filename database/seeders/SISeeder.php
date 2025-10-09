@@ -12,9 +12,10 @@ class SISeeder extends Seeder
     public function run(): void
     {
         // ===== USERS (dummy akun siswa, guru, ortu) =====
+
         $userSiswa = DB::table('users')->insertGetId([
-            'name' => 'Budi',
-            'email' => 'budi@siswa.com',
+            'name' => 'Danti',
+            'email' => 'danti@siswa.com',
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'created_at' => now(),

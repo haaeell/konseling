@@ -6,9 +6,29 @@
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
-                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#siswaModal">
-                    <i class="bi bi-plus-circle"></i> Tambah
-                </button>
+              <div class="d-flex mb-3">
+    <!-- Tombol Tambah -->
+    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#siswaModal">
+        <i class="bi bi-plus-circle"></i> Tambah
+    </button>
+
+    <!-- Tombol Download Template -->
+    <a href="{{ route('siswa.template') }}" class="btn btn-info me-2">
+        <i class="bi bi-download"></i> Download Template
+    </a>
+
+    <!-- Form Import -->
+    <form action="{{ route('siswa.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="input-group">
+            <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required>
+            <button class="btn btn-success" type="submit">
+                <i class="bi bi-file-earmark-arrow-up"></i> Import Excel
+            </button>
+        </div>
+    </form>
+</div>
+
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -37,7 +57,7 @@
                                     <td>{{ $s->nama_orangtua }}</td>
                                     <td>{{ $s->no_telp_orangtua }}</td>
                                     <td>{{ $s->alamat }}</td>
-                                    <td>
+                                    <td class="d-flex text-nowrap gap-2">
                                         <button class="btn btn-sm btn-warning edit-siswa" data-id="{{ $s->id }}"
                                             data-name="{{ $s->user->name }}" data-email="{{ $s->user->email }}"
                                             data-nisn="{{ $s->nisn }}" data-nis="{{ $s->nis }}"

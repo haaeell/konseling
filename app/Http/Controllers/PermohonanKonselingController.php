@@ -14,24 +14,57 @@ use App\Models\User;
 
 class PermohonanKonselingController extends Controller
 {
-    public function index()
-    {
-        $permohonanKonseling = PermohonanKonseling::with(['siswa.user', 'kategori'])
-        ->where('status', 'menunggu')
-            ->orderBy('skor_prioritas', 'desc')
-            ->orderBy('created_at', 'asc')
-            ->get();
-        $kategoriKonseling = KategoriKonseling::all();
-        return view('permohonan-konseling.index', compact('permohonanKonseling', 'kategoriKonseling'));
+   public function index()
+{
+    // Cegah akses untuk role tertentu
+    if (!Auth::check()) {
+        abort(403, 'Unauthorized access');
     }
+
+    $user = Auth::user();
+
+    $query = PermohonanKonseling::with(['siswa.user', 'kategori'])
+        ->where('status', 'menunggu')
+        ->orderBy('skor_prioritas', 'desc')
+        ->orderBy('created_at', 'asc');
+
+    $siswaWali = collect(); // default kosong
+
+    switch ($user->role) {
+        case 'siswa':
+            $query->where('siswa_id', $user->siswa->id);
+            break;
+
+        case 'guru':
+            if ($user->guru && $user->guru->role_guru === 'walikelas') {
+                // Guru wali kelas hanya bisa lihat siswa di kelasnya
+                $query->whereHas('siswa', function ($q) use ($user) {
+                    $q->where('kelas_id', $user->guru->kelas_id);
+                });
+
+                $siswaWali = \App\Models\Siswa::where('kelas_id', $user->guru->kelas_id)->get();
+            }
+            // Guru BK bisa lihat semua
+            break;
+
+        default:
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+    }
+
+    $permohonanKonseling = $query->get();
+    $kategoriKonseling = \App\Models\KategoriKonseling::all();
+
+    return view('permohonan-konseling.index', compact(
+        'permohonanKonseling',
+        'kategoriKonseling',
+        'siswaWali'
+    ));
+}
+
+
 
     public function store(Request $request)
     {
-        // Cek apakah user adalah siswa
-        if (Auth::user()->role !== 'siswa') {
-            return redirect()->back()->with('error', 'Hanya siswa yang dapat membuat permohonan konseling.');
-        }
-
         $request->validate([
             'kategori_id' => 'required|exists:kategori_konseling,id',
             'tanggal_pengajuan' => 'required|date',
@@ -41,7 +74,7 @@ class PermohonanKonselingController extends Controller
         $kategori = KategoriKonseling::findOrFail($request->kategori_id);
 
         $permohonan = PermohonanKonseling::create([
-            'siswa_id' => Auth::user()->id,
+            'siswa_id' => Auth::user()->siswa->id ?? $request->siswa_id,
             'kategori_id' => $request->kategori_id,
             'tanggal_pengajuan' => $request->tanggal_pengajuan,
             'deskripsi_permasalahan' => $request->deskripsi_permasalahan,

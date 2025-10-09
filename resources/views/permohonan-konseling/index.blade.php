@@ -6,7 +6,7 @@
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
-                @if (auth()->user()->role === 'siswa')
+                @if (auth()->user()->role === 'siswa' || auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'walikelas')
                     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#permohonanKonselingModal">
                         <i class="bi bi-plus-circle"></i> Buat Permohonan
                     </button>
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Modal Buat Permohonan (Siswa) -->
-    @if (auth()->user()->role === 'siswa')
+    @if (auth()->user()->role === 'siswa' || (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'walikelas'))
         <div class="modal fade" id="permohonanKonselingModal" tabindex="-1" aria-labelledby="permohonanKonselingModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -79,6 +79,22 @@
                     <form id="permohonanKonselingForm" method="POST" action="{{ route('permohonan-konseling.store') }}">
                         @csrf
                         <div class="modal-body">
+                            @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'walikelas')
+                                <div class="form-group mb-3">
+                                    <label for="siswa_id" class="form-label">Siswa</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <select class="form-control" id="siswa_id" name="siswa_id" required>
+                                            <option value="">Pilih Siswa</option>
+                                            @foreach ($siswaWali as $siswa)
+                                                <option value="{{ $siswa->id }}" {{ old('siswa_id') == $siswa->id ? 'selected' : '' }}>
+                                                    {{ $siswa->user->name }} - {{ $siswa->nisn }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="form-group mb-3">
                                 <label for="kategori_id" class="form-label">Kategori Konseling</label>
                                 <div class="input-group">
@@ -132,11 +148,12 @@
                         <div class="modal-body">
                             <div class="form-group mb-3">
                                 <label for="tanggal_disetujui" class="form-label">Tanggal Konseling</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-                                    <input type="date" class="form-control" id="tanggal_disetujui" name="tanggal_disetujui"
-                                        value="{{ old('tanggal_disetujui', now()->format('Y-m-d')) }}" required>
-                                </div>
+                              <div class="input-group">
+    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+    <input type="datetime-local" class="form-control" id="tanggal_disetujui" name="tanggal_disetujui"
+        value="{{ old('tanggal_disetujui', now()->format('Y-m-d\TH:i')) }}" required>
+</div>
+
                             </div>
                             <div class="form-group mb-3">
                                 <label for="tempat" class="form-label">Tempat Konseling</label>
