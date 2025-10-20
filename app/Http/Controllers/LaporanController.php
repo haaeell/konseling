@@ -53,8 +53,6 @@ class LaporanController extends Controller
                     break;
 
                 default:
-                    // selain role di atas tidak bisa akses laporan
-                    abort(403, 'Akses tidak diizinkan.');
             }
         }
 
@@ -69,8 +67,8 @@ class LaporanController extends Controller
                 $q->whereYear('tanggal_pengajuan', $year);
             }
         }])
-        ->orderByDesc('permohonan_count')
-        ->get();
+            ->orderByDesc('permohonan_count')
+            ->get();
 
         return view('laporan.index', compact(
             'laporan',

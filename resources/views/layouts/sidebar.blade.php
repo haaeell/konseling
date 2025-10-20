@@ -44,7 +44,7 @@
 
         {{-- Guru Wali Kelas → hanya bisa lihat Riwayat --}}
         @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'walikelas')
-          <li class="sidebar-item">
+            <li class="sidebar-item">
                 <a href="/permohonan-konseling" class='sidebar-link'>
                     <i class="bi bi-envelope-fill"></i>
                     <span>Permohonan Konseling</span>
@@ -103,7 +103,7 @@
         @endif
 
         {{-- Kepala Sekolah → bisa lihat semua laporan --}}
-        @if (auth()->user()->role === 'kepala_sekolah')
+        @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'kepala_sekolah')
             <li class="sidebar-item">
                 <a href="/laporan" class='sidebar-link'>
                     <i class="bi bi-bar-chart-fill"></i>
