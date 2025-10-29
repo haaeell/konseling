@@ -12,4 +12,17 @@ class NotificationController extends Controller
         Auth::user()->unreadNotifications->markAsRead();
         return redirect()->back()->with('success', 'Semua notifikasi telah ditandai sebagai dibaca.');
     }
+
+    public function markAsRead($id)
+    {
+        $user = Auth::user();
+        $notification = $user->notifications()->where('id', $id)->first();
+
+        if ($notification) {
+            $notification->markAsRead();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false], 404);
+    }
 }

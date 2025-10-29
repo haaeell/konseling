@@ -41,7 +41,7 @@
 
             .form-control {
                 border-radius: 10px;
-                box-shadow:#4eaff0;
+                box-shadow: #4eaff0;
             }
 
             .btn-login {
@@ -81,9 +81,9 @@
                 @csrf
                 <!-- Username -->
                 <div class="mb-3 text-start">
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" name="name"
-                        placeholder="name" value="{{ old('name') }}" required>
-                    @error('name')
+                    <input type="text" class="form-control @error('email') is-invalid @enderror" name="email"
+                        placeholder="email" value="{{ old('email') }}" required>
+                    @error('email')
                         <div class="invalid-feedback">
                             {{ $message }}
                         </div>

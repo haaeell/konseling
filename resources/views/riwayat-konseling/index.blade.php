@@ -27,12 +27,23 @@
                                     <td>{{ \Carbon\Carbon::parse($jadwal->tanggal_pengajuan)->format('d-m-Y') }}</td>
                                     <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
                                     <td>
-                                        <span class="badge
-                                            {{ $jadwal->status === 'menunggu' ? 'bg-warning' :
-                                               ($jadwal->status === 'disetujui' ? 'bg-success' :
-                                               ($jadwal->status === 'selesai' ? 'bg-primary' : 'bg-danger')) }}">
+                                        <span
+                                            class="badge
+                                            {{ $jadwal->status === 'menunggu'
+                                                ? 'bg-warning'
+                                                : ($jadwal->status === 'disetujui'
+                                                    ? 'bg-success'
+                                                    : ($jadwal->status === 'selesai'
+                                                        ? 'bg-primary'
+                                                        : 'bg-danger')) }}">
                                             {{ ucfirst($jadwal->status) }}
                                         </span>
+
+                                        @if ($jadwal->status === 'ditolak' && $jadwal->alasan_penolakan)
+                                            <div class="mt-1 small text-danger">
+                                                <i class="bi bi-info-circle"></i> {{ $jadwal->alasan_penolakan }}
+                                            </div>
+                                        @endif
                                     </td>
                                     <td>{{ Str::limit($jadwal->rangkuman, 50) }}</td>
                                     <td>{{ $jadwal->skor_prioritas }}</td>
@@ -51,10 +62,13 @@
     <script>
         $(document).ready(function() {
             $('#datatableRiwayat').DataTable({
-                order: [[5, 'desc']],
-                columnDefs: [
-                    { orderable: false, targets: -1 }
-                ]
+                order: [
+                    [5, 'desc']
+                ],
+                columnDefs: [{
+                    orderable: false,
+                    targets: -1
+                }]
             });
         });
     </script>

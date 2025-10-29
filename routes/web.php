@@ -13,6 +13,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -59,4 +60,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('permohonan-konseling/complete/{id}', [PermohonanKonselingController::class, 'complete'])->name('permohonan-konseling.complete');
 
     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
+    Route::get('/laporan/cetak-pdf', [LaporanController::class, 'cetakPdf'])->name('laporan.cetak-pdf');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });

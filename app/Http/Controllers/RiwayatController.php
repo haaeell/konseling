@@ -9,22 +9,22 @@ use Illuminate\Support\Facades\Auth;
 
 class RiwayatController extends Controller
 {
-   public function index()
-{
-    $query = PermohonanKonseling::with(['siswa.user', 'kategori'])
-        ->where('status', 'selesai')
-        ->orderBy('skor_prioritas', 'desc')
-        ->orderBy('created_at', 'asc');
+    public function index()
+    {
+        $query = PermohonanKonseling::with(['siswa.user', 'kategori'])
+            ->whereIn('status', ['selesai', 'ditolak'])
+            ->orderBy('skor_prioritas', 'desc')
+            ->orderBy('created_at', 'asc');
 
-    if (Auth::check()) {
-        $user = Auth::user();
+        if (Auth::check()) {
+            $user = Auth::user();
 
-        switch ($user->role) {
-            case 'siswa':
-                $query->where('siswa_id', $user->siswa->id);
-                break;
+            switch ($user->role) {
+                case 'siswa':
+                    $query->where('siswa_id', $user->siswa->id);
+                    break;
 
-            case 'guru':
+                case 'guru':
                     // cek apakah guru adalah wali kelas atau guru BK
                     if ($user->guru && $user->guru->role_guru === 'walikelas') {
                         // wali kelas hanya lihat siswa di kelasnya
@@ -36,21 +36,20 @@ class RiwayatController extends Controller
                     }
                     break;
 
-            case 'orangtua':
-                $query->whereHas('siswa.orangtua', function ($q) use ($user) {
-                    $q->where('user_id', $user->id);
-                });
-                break;
+                case 'orangtua':
+                    $query->whereHas('siswa.orangtua', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
+
+        $riwayatKonseling = $query->get();
+        $kategoriKonseling = KategoriKonseling::all();
+
+        return view('riwayat-konseling.index', compact('riwayatKonseling', 'kategoriKonseling'));
     }
-
-    $riwayatKonseling = $query->get();
-    $kategoriKonseling = KategoriKonseling::all();
-
-    return view('riwayat-konseling.index', compact('riwayatKonseling', 'kategoriKonseling'));
-}
-
 }

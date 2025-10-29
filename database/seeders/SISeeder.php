@@ -11,43 +11,13 @@ class SISeeder extends Seeder
 {
     public function run(): void
     {
-        // ===== USERS (dummy akun siswa, guru, ortu) =====
-
-        $userSiswa = DB::table('users')->insertGetId([
-            'name' => 'Danti',
-            'email' => 'danti@siswa.com',
-            'password' => Hash::make('password'),
-            'role' => 'siswa',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $userOrtu = DB::table('users')->insertGetId([
-            'name' => 'andi',
-            'email' => 'andi@ortu.com',
-            'password' => Hash::make('password'),
-            'role' => 'orangtua',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $userGuru = DB::table('users')->insertGetId([
-            'name' => 'bk',
-            'email' => 'bk@guru.com',
-            'password' => Hash::make('password'),
-            'role' => 'guru',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // ===== Tahun Akademik =====
+        // ====== DATA DASAR ======
         $tahunAkademikId = DB::table('tahun_akademik')->insertGetId([
             'tahun' => '2024/2025',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // ===== Kelas =====
         $kelasId = DB::table('kelas')->insertGetId([
             'nama' => 'XII IPA 1',
             'tahun_akademik_id' => $tahunAkademikId,
@@ -55,24 +25,50 @@ class SISeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // ===== Siswa =====
+        // ====== SISWA (PAKAI NIS & DOMAIN SMANJA) ======
+        $nis = '2024001';
+        $nisn = '1234567890';
+        $namaSiswa = 'Danti';
+        $namaOrtu = 'Pak Andi';
+
+        // User siswa
+        $userSiswaId = DB::table('users')->insertGetId([
+            'name' => $namaSiswa,
+            'email' => $nis . '@smanja.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'siswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // User orangtua
+        $userOrtuId = DB::table('users')->insertGetId([
+            'name' => $namaOrtu,
+            'email' => 'ortu_' . $nis . '@smanja.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'orangtua',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Data siswa
         $siswaId = DB::table('siswa')->insertGetId([
-            'user_id' => $userSiswa,
-            'nisn' => '1234567890',
-            'nis' => '2024001',
+            'user_id' => $userSiswaId,
+            'nisn' => $nisn,
+            'nis' => $nis,
             'kelas_id' => $kelasId,
-            'jenis_kelamin' => 'L',
+            'jenis_kelamin' => 'P',
+            'nama_orangtua' => $namaOrtu,
             'no_telp_orangtua' => '08123456789',
-            'nama_orangtua' => 'Pak Andi',
             'alamat' => 'Jl. Merdeka No. 10',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // ===== Orangtua =====
+        // Data orangtua
         DB::table('orangtua')->insert([
-            'user_id' => $userOrtu,
-            'nama' => 'Pak Andi',
+            'user_id' => $userOrtuId,
+            'nama' => $namaOrtu,
             'hubungan_dengan_siswa' => 'Ayah',
             'no_hp' => '08123456789',
             'alamat' => 'Jl. Merdeka No. 10',
@@ -81,10 +77,20 @@ class SISeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // ===== Guru =====
-        $guruId = DB::table('guru')->insertGetId([
-            'user_id' => $userGuru,
-            'nama' => 'Bu Siti',
+        // ====== GURU ======
+        $namaGuru = 'Bu Siti';
+        $userGuruId = DB::table('users')->insertGetId([
+            'name' => $namaGuru,
+            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'guru',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('guru')->insert([
+            'user_id' => $userGuruId,
+            'nama' => $namaGuru,
             'nip' => '198001012005012001',
             'jenis_kelamin' => 'P',
             'no_hp' => '08234567890',
@@ -95,7 +101,7 @@ class SISeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // ===== Kategori Konseling =====
+        // ====== KATEGORI KONSELING ======
         $kategoriAkademikId = DB::table('kategori_konseling')->insertGetId([
             'nama' => 'Akademik',
             'skor_prioritas' => 70,
@@ -109,7 +115,7 @@ class SISeeder extends Seeder
             ['nama' => 'Karir', 'skor_prioritas' => 40, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // ===== Permohonan Konseling =====
+        // ====== PERMOHONAN KONSELING (dummy) ======
         DB::table('permohonan_konseling')->insert([
             'siswa_id' => $siswaId,
             'kategori_id' => $kategoriAkademikId,

@@ -25,7 +25,6 @@ class SiswaController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
             'nisn' => 'required|string|unique:siswa,nisn',
             'nis' => 'required|string|unique:siswa,nis',
             'kelas_id' => 'required|exists:kelas,id',
@@ -36,23 +35,21 @@ class SiswaController extends Controller
             'alamat' => 'required|string',
         ]);
 
-        // Buat user untuk siswa
         $userSiswa = User::create([
             'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make('password'), // Default password, bisa diganti
+            'email' => $request->nis . '@smanja.ac.id',
+            'password' => Hash::make('password'),
             'role' => 'siswa',
         ]);
 
-        // Buat user untuk orangtua
+
         $userOrangtua = User::create([
             'name' => $request->nama_orangtua,
-            'email' => 'orangtua_' . $request->email, // Email unik untuk orangtua
-            'password' => Hash::make('password'), // Default password, bisa diganti
+            'email' => 'ortu_' . $request->nis . '@smanja.ac.id',
+            'password' => Hash::make('password'),
             'role' => 'orangtua',
         ]);
 
-        // Buat data siswa
         $siswa = Siswa::create([
             'user_id' => $userSiswa->id,
             'nisn' => $request->nisn,
@@ -64,7 +61,6 @@ class SiswaController extends Controller
             'alamat' => $request->alamat,
         ]);
 
-        // Buat data orangtua
         Orangtua::create([
             'user_id' => $userOrangtua->id,
             'nama' => $request->nama_orangtua,
@@ -78,20 +74,20 @@ class SiswaController extends Controller
     }
 
     public function import(Request $request)
-{
-    $request->validate([
-        'file' => 'required|mimes:xlsx,xls'
-    ]);
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
 
-    Excel::import(new SiswaImport, $request->file('file'));
+        Excel::import(new SiswaImport, $request->file('file'));
 
-    return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diimport.');
-}
+        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diimport.');
+    }
 
-public function downloadTemplate()
-{
-    return Excel::download(new SiswaTemplateExport, 'template_import_siswa.xlsx');
-}
+    public function downloadTemplate()
+    {
+        return Excel::download(new SiswaTemplateExport, 'template_import_siswa.xlsx');
+    }
 
     public function update(Request $request, $id)
     {
@@ -102,7 +98,6 @@ public function downloadTemplate()
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $userSiswa->id,
             'nisn' => 'required|string|unique:siswa,nisn,' . $siswa->id,
             'nis' => 'required|string|unique:siswa,nis,' . $siswa->id,
             'kelas_id' => 'required|exists:kelas,id',
@@ -113,13 +108,11 @@ public function downloadTemplate()
             'alamat' => 'required|string',
         ]);
 
-        // Update user siswa
         $userSiswa->update([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $request->nis . '@smanja.ac.id',
         ]);
 
-        // Update data siswa
         $siswa->update([
             'nisn' => $request->nisn,
             'nis' => $request->nis,
@@ -130,11 +123,10 @@ public function downloadTemplate()
             'alamat' => $request->alamat,
         ]);
 
-        // Update atau buat data orangtua
         if ($orangtua && $userOrangtua) {
             $userOrangtua->update([
                 'name' => $request->nama_orangtua,
-                'email' => 'orangtua_' . $request->email, // Update email orangtua
+                'email' => 'ortu_' . $request->nis . '@smanja.ac.id',
             ]);
 
             $orangtua->update([
@@ -144,7 +136,6 @@ public function downloadTemplate()
                 'alamat' => $request->alamat,
             ]);
         } else {
-            // Buat user orangtua baru jika belum ada
             $userOrangtua = User::create([
                 'name' => $request->nama_orangtua,
                 'email' => 'orangtua_' . $request->email,
@@ -169,7 +160,7 @@ public function downloadTemplate()
     {
         $siswa = Siswa::findOrFail($id);
         $userSiswa = User::findOrFail($siswa->user_id);
-        $siswa->delete(); // Menghapus siswa, user, dan orangtua terkait karena onDelete('cascade')
+        $siswa->delete();
         $userSiswa->delete();
         return redirect()->route('siswa.index')->with('success', 'Siswa dan data orangtua berhasil dihapus.');
     }

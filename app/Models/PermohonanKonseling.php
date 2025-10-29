@@ -13,6 +13,7 @@ class PermohonanKonseling extends Model
         'deskripsi_permasalahan',
         'status',
         'rangkuman',
+        'alasan_penolakan',
         'tanggal_disetujui',
         'tempat',
         'skor_prioritas',
