@@ -8,8 +8,8 @@
 
         <title>Dashboard </title>
 
-        <link rel="shortcut icon" href="{{ asset('../assets') }}/img/logo2.png" type="image/x-icon">
-        <link rel="shortcut icon" href="{{ asset('../assets') }}/img/logo.png" type="image/png">
+        <link rel="shortcut icon" href="/logosmanja.png" type="image/x-icon">
+        <link rel="shortcut icon" href="/logosmanja.png" type="image/png">
         <link rel="stylesheet" href="{{ asset('../assets') }}/compiled/css/app.css">
         <link rel="stylesheet" href="{{ asset('../assets') }}/compiled/css/app-dark.css">
         <link rel="stylesheet" href="{{ asset('../assets') }}/compiled/css/iconly.css">
@@ -36,7 +36,7 @@
                     <div class="sidebar-header position-relative">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="logo">
-                                <a href="/"><img src="https://placehold.co/600x400" class="pt-3"
+                                <a href="/"><img src="/logosmanja.png" class="pt-3"
                                         style="max-width: 100px; height: auto;" alt=""></a>
                             </div>
                             <div class="theme-toggle d-flex gap-2  align-items-center mt-2">

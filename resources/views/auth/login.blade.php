@@ -20,7 +20,7 @@
                 width: 100%;
                 max-width: 500px;
                 padding: 30px;
-                border: 2px solid #4eaff0;
+                border: 2px solid #d467b2;
                 border-radius: 12px;
                 text-align: center;
                 background: #fff;
@@ -29,7 +29,7 @@
             .login-logo {
                 width: 100px;
                 height: 100px;
-                background: #4eaff0;
+                background: #d467b2;
                 color: #fff;
                 border-radius: 50%;
                 display: flex;
@@ -41,11 +41,11 @@
 
             .form-control {
                 border-radius: 10px;
-                box-shadow: #4eaff0;
+                box-shadow: #d467b2;
             }
 
             .btn-login {
-                background: #4eaff0;
+                background: #d467b2;
                 color: #fff;
                 border-radius: 10px;
                 width: 100%;
@@ -54,7 +54,7 @@
             }
 
             .btn-login:hover {
-                background: #4eaff0;
+                background: #d467b2;
                 color: #fff;
             }
 
@@ -72,7 +72,7 @@
     <body>
         <div class="login-card">
             <div class="login-logo mb-5">
-                LOGO<br>SMANJA
+                <img src="/logosmanja.png" width="100" alt="">
             </div>
             <h5 class="fw-bold">SISTEM INFORMASI BIMBINGAN KONSELING</h5>
             <h6 class="fw-bold mb-5">(SI-BK)</h6>

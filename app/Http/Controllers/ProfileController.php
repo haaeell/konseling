@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Siswa;
 use App\Models\Guru;
 use App\Models\Orangtua;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -34,21 +35,33 @@ class ProfileController extends Controller
         $user = Auth::user();
         $role = $user->role;
 
-        $rules = ['name' => 'required|string|max:255'];
+        $rules = [
+            'name' => 'required|string|max:255',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+
         if ($request->filled('password')) {
             $rules['password'] = 'confirmed|min:6';
         }
 
-        // Validasi umum
         $request->validate($rules);
 
-        // Update user
+        if ($request->hasFile('foto')) {
+            if ($user->foto && Storage::exists('public/' . $user->foto)) {
+                Storage::delete('public/' . $user->foto);
+            }
+
+            $fotoPath = $request->file('foto')->store('foto_profile', 'public');
+            $user->foto = $fotoPath;
+        }
+
         $user->update([
-            'name' => $request->name,
-            'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
+            'name'     => $request->name,
+            'password' => $request->filled('password')
+                ? Hash::make($request->password)
+                : $user->password,
         ]);
 
-        // Update data tambahan sesuai role
         if ($role === 'siswa' && $user->siswa) {
             $user->siswa->update([
                 'no_telp_orangtua' => $request->no_telp_orangtua,
@@ -57,8 +70,8 @@ class ProfileController extends Controller
             ]);
         } elseif ($role === 'guru' && $user->guru) {
             $user->guru->update([
-                'no_hp'    => $request->no_hp,
-                'alamat'   => $request->alamat,
+                'no_hp'  => $request->no_hp,
+                'alamat' => $request->alamat,
             ]);
         } elseif ($role === 'orangtua') {
             $ortu = $user->orangtua()->first();

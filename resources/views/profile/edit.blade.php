@@ -18,8 +18,26 @@
                     </div>
                 @endif
 
-                <form action="{{ route('profile.update') }}" method="POST">
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+
+                    {{-- ========== FOTO PROFIL ========== --}}
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <img id="previewImage"
+                                src="{{ $user->foto ? asset('storage/' . $user->foto) : 'https://placehold.co/120x120?text=Foto' }}"
+                                alt="Foto Profil" class="rounded-circle shadow-sm"
+                                style="width: 120px; height: 120px; object-fit: cover;">
+
+                            <label for="foto"
+                                class="btn btn-sm btn-light border position-absolute bottom-0 end-0 rounded-circle"
+                                style="width: 35px; height: 35px;">
+                                <i class="bi bi-camera-fill text-primary"></i>
+                            </label>
+                        </div>
+                        <input type="file" name="foto" id="foto" accept="image/*" class="d-none">
+                        <p class="text-muted small mt-2">Format: JPG, PNG, Max 2MB</p>
+                    </div>
 
                     {{-- ========== UMUM ========== --}}
                     <div class="mb-3">
@@ -106,4 +124,28 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputFoto = document.querySelector('#foto');
+            const previewImg = document.querySelector('#previewImage');
+
+            if (!inputFoto || !previewImg) return;
+
+            inputFoto.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result;
+                    // Hilangkan cache, ganti dengan blob sementara agar browser langsung refresh
+                    previewImg.style.opacity = '0.8';
+                    setTimeout(() => previewImg.style.opacity = '1', 200);
+                };
+
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
 @endsection
