@@ -95,6 +95,53 @@ class SISeeder extends Seeder
             'jenis_kelamin' => 'P',
             'no_hp' => '08234567890',
             'alamat' => 'Jl. Pendidikan No. 5',
+            'role_guru' => 'walikelas',
+            'kelas_id' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $namaGuru = 'Eko Adinuryadin';
+        $userGuruId = DB::table('users')->insertGetId([
+            'name' => $namaGuru,
+            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'guru',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('guru')->insert([
+            'user_id' => $userGuruId,
+            'nama' => $namaGuru,
+            'nip' => '197805252008011011',
+            'jenis_kelamin' => 'L',
+            'no_hp' => '08234567893',
+            'alamat' => 'Jl. Pendidikan No. 5',
+            'role_guru' => 'kepala_sekolah',
+            'kelas_id' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+
+        $namaGuru = 'Suraji';
+        $userGuruId = DB::table('users')->insertGetId([
+            'name' => $namaGuru,
+            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.ac.id',
+            'password' => Hash::make('password'),
+            'role' => 'guru',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('guru')->insert([
+            'user_id' => $userGuruId,
+            'nama' => $namaGuru,
+            'nip' => '196804102005011012',
+            'jenis_kelamin' => 'L',
+            'no_hp' => '08234567891',
+            'alamat' => 'Jl. Pendidikan No. 5',
             'role_guru' => 'bk',
             'kelas_id' => null,
             'created_at' => now(),
