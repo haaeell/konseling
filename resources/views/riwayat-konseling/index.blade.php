@@ -11,7 +11,6 @@
                         <thead>
                             <tr>
                                 <th>Siswa</th>
-                                <th>Kategori</th>
                                 <th>Tanggal Pengajuan</th>
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
@@ -23,7 +22,6 @@
                             @foreach ($riwayatKonseling as $jadwal)
                                 <tr data-id="{{ $jadwal->id }}">
                                     <td>{{ $jadwal->siswa->user->name }}</td>
-                                    <td>{{ $jadwal->kategori->nama }}</td>
                                     <td>{{ \Carbon\Carbon::parse($jadwal->tanggal_pengajuan)->format('d-m-Y') }}</td>
                                     <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
                                     <td>
@@ -46,7 +44,20 @@
                                         @endif
                                     </td>
                                     <td>{{ Str::limit($jadwal->rangkuman, 50) }}</td>
-                                    <td>{{ $jadwal->skor_prioritas }}</td>
+                                    <td>
+                                        <strong>{{ $jadwal->skor_prioritas }}</strong>
+                                        <div class="text-muted small">
+                                            <div>Urgensi: {{ $jadwal->tingkat_urgensi_label }}
+                                                ({{ $jadwal->tingkat_urgensi_skor }})
+                                            </div>
+                                            <div>Dampak: {{ $jadwal->dampak_masalah_label }}
+                                                ({{ $jadwal->dampak_masalah_skor }})</div>
+                                            <div>Kategori: {{ $jadwal->kategori_masalah_label }}
+                                                ({{ $jadwal->kategori_masalah_skor }})</div>
+                                            <div>Riwayat: {{ $jadwal->riwayat_konseling_label }}
+                                                ({{ $jadwal->riwayat_konseling_skor }})</div>
+                                        </div>
+                                    </td>
 
                                 </tr>
                             @endforeach

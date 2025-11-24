@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class PermohonanKonseling extends Model
 {
+    protected $table = 'permohonan_konseling';
+
     protected $fillable = [
         'siswa_id',
-        'kategori_id',
         'tanggal_pengajuan',
         'deskripsi_permasalahan',
         'status',
@@ -16,18 +17,26 @@ class PermohonanKonseling extends Model
         'alasan_penolakan',
         'tanggal_disetujui',
         'tempat',
+
+        // Kriteria Penilaian
+        'tingkat_urgensi_label',
+        'tingkat_urgensi_skor',
+
+        'dampak_masalah_label',
+        'dampak_masalah_skor',
+
+        'kategori_masalah_label',
+        'kategori_masalah_skor',
+
+        'riwayat_konseling_label',
+        'riwayat_konseling_skor',
+
         'skor_prioritas',
     ];
 
-    protected $table = 'permohonan_konseling';
-
+    // Relasi
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
-    }
-
-    public function kategori()
-    {
-        return $this->belongsTo(KategoriKonseling::class, 'kategori_id');
     }
 }

@@ -34,19 +34,25 @@
                             @foreach ($permohonanKonseling as $permohonan)
                                 <tr data-id="{{ $permohonan->id }}">
                                     <td>{{ $permohonan->siswa->user->name }}</td>
-                                    <td>{{ $permohonan->kategori->nama }}</td>
+
+                                    {{-- KATEGORI MASALAH --}}
+                                    <td>{{ $permohonan->kategori_masalah_label }}</td>
+
                                     <td>{{ \Carbon\Carbon::parse($permohonan->tanggal_pengajuan)->format('d-m-Y') }}</td>
+
                                     <td>{{ Str::limit($permohonan->deskripsi_permasalahan, 50) }}</td>
+
+                                    {{-- STATUS --}}
                                     <td>
                                         <span
                                             class="badge
-                                            {{ $permohonan->status === 'menunggu'
-                                                ? 'bg-warning'
-                                                : ($permohonan->status === 'disetujui'
-                                                    ? 'bg-success'
-                                                    : ($permohonan->status === 'selesai'
-                                                        ? 'bg-primary'
-                                                        : 'bg-danger')) }}">
+                                                {{ $permohonan->status === 'menunggu'
+                                                    ? 'bg-warning'
+                                                    : ($permohonan->status === 'disetujui'
+                                                        ? 'bg-success'
+                                                        : ($permohonan->status === 'selesai'
+                                                            ? 'bg-primary'
+                                                            : 'bg-danger')) }}">
                                             {{ ucfirst($permohonan->status) }}
                                         </span>
 
@@ -57,24 +63,43 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ $permohonan->skor_prioritas }}</td>
+                                    {{-- SKOR PRIORITAS --}}
+                                    <td>
+                                        <strong>{{ $permohonan->skor_prioritas }}</strong>
+                                        <div class="text-muted small">
+                                            <div>Urgensi: {{ $permohonan->tingkat_urgensi_label }}
+                                                ({{ $permohonan->tingkat_urgensi_skor }})</div>
+                                            <div>Dampak: {{ $permohonan->dampak_masalah_label }}
+                                                ({{ $permohonan->dampak_masalah_skor }})</div>
+                                            <div>Kategori: {{ $permohonan->kategori_masalah_label }}
+                                                ({{ $permohonan->kategori_masalah_skor }})</div>
+                                            <div>Riwayat: {{ $permohonan->riwayat_konseling_label }}
+                                                ({{ $permohonan->riwayat_konseling_skor }})</div>
+                                        </div>
+                                    </td>
+
                                     @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'bk')
                                         <td>
                                             @if ($permohonan->status === 'menunggu')
                                                 <button class="btn btn-sm btn-success approve-permohonan"
                                                     data-id="{{ $permohonan->id }}" data-bs-toggle="modal"
-                                                    data-bs-target="#approveModal"><i class="bi bi-check-circle"></i>
-                                                    Setujui</button>
+                                                    data-bs-target="#approveModal">
+                                                    <i class="bi bi-check-circle"></i> Setujui
+                                                </button>
+
                                                 <button class="btn btn-sm btn-danger reject-permohonan"
                                                     data-id="{{ $permohonan->id }}" data-bs-toggle="modal"
-                                                    data-bs-target="#rejectModal"><i class="bi bi-x-circle"></i>
-                                                    Tolak</button>
+                                                    data-bs-target="#rejectModal">
+                                                    <i class="bi bi-x-circle"></i> Tolak
+                                                </button>
                                             @endif
+
                                             @if ($permohonan->status === 'disetujui')
                                                 <button class="btn btn-sm btn-primary complete-permohonan"
                                                     data-id="{{ $permohonan->id }}" data-bs-toggle="modal"
-                                                    data-bs-target="#completeModal"><i class="bi bi-check2-all"></i>
-                                                    Selesai</button>
+                                                    data-bs-target="#completeModal">
+                                                    <i class="bi bi-check2-all"></i> Selesai
+                                                </button>
                                             @endif
                                         </td>
                                     @endif
@@ -87,79 +112,148 @@
         </div>
     </div>
 
-    <!-- Modal Buat Permohonan (Siswa) -->
     @if (auth()->user()->role === 'siswa' ||
             (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'walikelas'))
-        <div class="modal fade" id="permohonanKonselingModal" tabindex="-1" aria-labelledby="permohonanKonselingModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="permohonanKonselingModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
+
                     <div class="modal-header">
-                        <h5 class="modal-title" id="permohonanKonselingModalLabel">Buat Permohonan Konseling</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Buat Permohonan Konseling</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <form id="permohonanKonselingForm" method="POST" action="{{ route('permohonan-konseling.store') }}">
+
+                    <form method="POST" action="{{ route('permohonan-konseling.store') }}">
                         @csrf
+
                         <div class="modal-body">
-                            @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'walikelas')
-                                <div class="form-group mb-3">
-                                    <label for="siswa_id" class="form-label">Siswa</label>
+
+                            @if (auth()->user()->role === 'guru' && auth()->user()->guru->role_guru === 'walikelas')
+                                <div class="mb-3">
+                                    <label class="form-label">Siswa</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <select class="form-control" id="siswa_id" name="siswa_id" required>
+                                        <select class="form-control" name="siswa_id" required>
                                             <option value="">Pilih Siswa</option>
                                             @foreach ($siswaWali as $siswa)
-                                                <option value="{{ $siswa->id }}"
-                                                    {{ old('siswa_id') == $siswa->id ? 'selected' : '' }}>
-                                                    {{ $siswa->user->name }} - {{ $siswa->nisn }}
-                                                </option>
+                                                <option value="{{ $siswa->id }}">{{ $siswa->user->name }} -
+                                                    {{ $siswa->nisn }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
                             @endif
-                            <div class="form-group mb-3">
-                                <label for="kategori_id" class="form-label">Kategori Konseling</label>
+
+                            {{-- Tingkat Urgensi --}}
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Tingkat Urgensi
+                                </label>
+
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-tag"></i></span>
-                                    <select class="form-control" id="kategori_id" name="kategori_id" required>
-                                        <option value="">Pilih Kategori</option>
-                                        @foreach ($kategoriKonseling as $kategori)
-                                            <option value="{{ $kategori->id }}"
-                                                data-skor="{{ $kategori->skor_prioritas }}">{{ $kategori->nama }}</option>
-                                        @endforeach
+                                    <span class="input-group-text"><i class="bi bi-lightning-charge"></i></span>
+                                    <select class="form-control" name="tingkat_urgensi_skor" required
+                                        onchange="document.getElementById('tingkat_urgensi_label').value=this.options[this.selectedIndex].text;">
+                                        <option value="">Pilih Tingkat Urgensi</option>
+                                        <option value="20">Tidak Mendesak</option>
+                                        <option value="40">Sedang Mendesak </option>
+                                        <option value="70">Mendesak </option>
+                                        <option value="90">Sangat Mendesak</option>
                                     </select>
+                                    <input type="hidden" name="tingkat_urgensi_label" id="tingkat_urgensi_label">
                                 </div>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="tanggal_pengajuan" class="form-label">Tanggal Pengajuan</label>
+
+                            {{-- Dampak Masalah --}}
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Dampak Masalah
+                                </label>
+
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-                                    <input type="date" class="form-control" id="tanggal_pengajuan"
-                                        name="tanggal_pengajuan"
-                                        value="{{ old('tanggal_pengajuan', now()->format('Y-m-d')) }}" required>
+                                    <span class="input-group-text"><i class="bi bi-bar-chart"></i></span>
+                                    <select class="form-control" name="dampak_masalah_skor" required
+                                        onchange="document.getElementById('dampak_masalah_label').value=this.options[this.selectedIndex].text;">
+                                        <option value="">Pilih Dampak Masalah</option>
+                                        <option value="20">Dampak Kecil</option>
+                                        <option value="40">Dampak Sedang</option>
+                                        <option value="70">Dampak Besar</option>
+                                        <option value="90">Dampak Sangat Besar </option>
+                                    </select>
+                                    <input type="hidden" name="dampak_masalah_label" id="dampak_masalah_label">
                                 </div>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="deskripsi_permasalahan" class="form-label">Deskripsi Permasalahan</label>
+
+                            {{-- Kategori Masalah --}}
+                            {{-- Kategori Masalah --}}
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Kategori Masalah
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-layers"></i></span>
+                                    <select class="form-control" name="kategori_masalah_skor" required
+                                        onchange="document.getElementById('kategori_masalah_label').value=this.options[this.selectedIndex].text;">
+
+                                        <option value="">Pilih Kategori Masalah</option>
+
+                                        {{-- Akademik --}}
+                                        <option value="20">Akademik</option>
+                                        <option value="40">Karir</option>
+                                        <option value="70">Pribadi</option>
+                                        <option value="90">Sosial</option>
+
+                                    </select>
+
+                                    <input type="hidden" name="kategori_masalah_label" id="kategori_masalah_label">
+                                </div>
+                            </div>
+
+
+                            {{-- Riwayat Konseling --}}
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Riwayat Konseling
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-clock-history"></i></span>
+                                    <select class="form-control" name="riwayat_konseling_skor" required
+                                        onchange="document.getElementById('riwayat_konseling_label').value=this.options[this.selectedIndex].text;">
+                                        <option value="">Pilih Riwayat Konseling</option>
+                                        <option value="20">Sudah Sering Konseling (0–20)</option>
+                                        <option value="40">Sudah Beberapa Kali (21–50)</option>
+                                        <option value="70">Jarang Pernah (51–80)</option>
+                                        <option value="90">Belum Pernah Konseling (81–100)</option>
+                                    </select>
+                                    <input type="hidden" name="riwayat_konseling_label" id="riwayat_konseling_label">
+                                </div>
+                            </div>
+
+                            {{-- Deskripsi --}}
+                            <div class="mb-3">
+                                <label class="form-label">Deskripsi Permasalahan</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-textarea"></i></span>
-                                    <textarea class="form-control" id="deskripsi_permasalahan" name="deskripsi_permasalahan"
-                                        placeholder="Jelaskan permasalahan Anda" required>{{ old('deskripsi_permasalahan') }}</textarea>
+                                    <textarea class="form-control" name="deskripsi_permasalahan" rows="4" required
+                                        placeholder="Jelaskan permasalahan secara lengkap..."></textarea>
                                 </div>
                             </div>
+
                         </div>
+
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Kirim Permohonan</button>
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button class="btn btn-primary"><i class="bi bi-send"></i> Kirim Permohonan</button>
                         </div>
+
                     </form>
+
                 </div>
             </div>
         </div>
     @endif
-
-    <!-- Modal Setujui Permohonan (BK) -->
     @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'bk')
         <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel"
             aria-hidden="true">
@@ -268,34 +362,29 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            // Set action URL untuk form setujui
             $('.approve-permohonan').on('click', function() {
                 $('#approveForm').attr('action', "{{ url('permohonan-konseling/approve') }}/" + $(this)
                     .data('id'));
             });
 
-            // Set action URL untuk form tolak
             $('.reject-permohonan').on('click', function() {
                 $('#rejectForm').attr('action', "{{ url('permohonan-konseling/reject') }}/" + $(this).data(
                     'id'));
             });
 
-            // Set action URL untuk form selesai
             $('.complete-permohonan').on('click', function() {
                 $('#completeForm').attr('action', "{{ url('permohonan-konseling/complete') }}/" + $(this)
                     .data('id'));
             });
 
-            // Inisialisasi DataTables dengan sorting berdasarkan skor_prioritas
             $('#datatablePermohonanpe').DataTable({
                 order: [
                     [5, 'desc']
-                ], // Urutkan berdasarkan kolom skor_prioritas (index 5) secara descending
+                ],
                 columnDefs: [{
-                        orderable: false,
-                        targets: -1
-                    } // Nonaktifkan sorting pada kolom aksi
-                ]
+                    orderable: false,
+                    targets: -1
+                }]
             });
         });
     </script>

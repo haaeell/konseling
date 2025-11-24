@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(SISeeder::class);
+        $this->call([
+            SISeeder::class,
+            KriteriaPrioritasSeeder::class
+        ]);
     }
 }

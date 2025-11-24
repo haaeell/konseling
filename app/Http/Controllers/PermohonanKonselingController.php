@@ -22,7 +22,7 @@ class PermohonanKonselingController extends Controller
 
         $user = Auth::user();
 
-        $query = PermohonanKonseling::with(['siswa.user', 'kategori'])
+        $query = PermohonanKonseling::with(['siswa.user'])
             ->where('status', 'menunggu')
             ->orderBy('skor_prioritas', 'desc')
             ->orderBy('created_at', 'asc');
@@ -62,29 +62,52 @@ class PermohonanKonselingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kategori_id' => 'required|exists:kategori_konseling,id',
-            'tanggal_pengajuan' => 'required|date',
             'deskripsi_permasalahan' => 'required|string',
+            'tingkat_urgensi_label' => 'required|string',
+            'tingkat_urgensi_skor' => 'required|integer',
+            'dampak_masalah_label' => 'required|string',
+            'dampak_masalah_skor' => 'required|integer',
+            'kategori_masalah_label' => 'required|string',
+            'kategori_masalah_skor' => 'required|integer',
+            'riwayat_konseling_label' => 'required|string',
+            'riwayat_konseling_skor' => 'required|integer',
         ]);
 
-        $kategori = KategoriKonseling::findOrFail($request->kategori_id);
+        $skorAkhir =
+            ($request->tingkat_urgensi_skor * 0.4) +
+            ($request->dampak_masalah_skor * 0.3) +
+            ($request->kategori_masalah_skor * 0.2) +
+            ($request->riwayat_konseling_skor * 0.1);
 
         $permohonan = PermohonanKonseling::create([
             'siswa_id' => Auth::user()->siswa->id ?? $request->siswa_id,
-            'kategori_id' => $request->kategori_id,
-            'tanggal_pengajuan' => $request->tanggal_pengajuan,
+            'tanggal_pengajuan' => now(),
             'deskripsi_permasalahan' => $request->deskripsi_permasalahan,
             'status' => 'menunggu',
-            'skor_prioritas' => $kategori->skor_prioritas,
+
+            'tingkat_urgensi_label' => $request->tingkat_urgensi_label,
+            'tingkat_urgensi_skor' => $request->tingkat_urgensi_skor,
+
+            'dampak_masalah_label' => $request->dampak_masalah_label,
+            'dampak_masalah_skor' => $request->dampak_masalah_skor,
+
+            'kategori_masalah_label' => $request->kategori_masalah_label,
+            'kategori_masalah_skor' => $request->kategori_masalah_skor,
+
+            'riwayat_konseling_label' => $request->riwayat_konseling_label,
+            'riwayat_konseling_skor' => $request->riwayat_konseling_skor,
+
+            'skor_prioritas' => $skorAkhir,
         ]);
 
-        $guruBk = User::whereHas('guru', function ($q) {
-            $q->where('role_guru', 'bk');
-        })->get();
-
+        $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
         $user = Auth::user()->name;
+
         foreach ($guruBk as $guru) {
-            $guru->notify(new PermohonanKonselingNotification($permohonan,  `$user mengajukan permohonan konseling.`));
+            $guru->notify(new PermohonanKonselingNotification(
+                $permohonan,
+                "$user mengajukan permohonan konseling."
+            ));
         }
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil diajukan.');

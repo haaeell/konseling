@@ -11,7 +11,7 @@ class RiwayatController extends Controller
 {
     public function index()
     {
-        $query = PermohonanKonseling::with(['siswa.user', 'kategori'])
+        $query = PermohonanKonseling::with(['siswa.user'])
             ->whereIn('status', ['selesai', 'ditolak'])
             ->orderBy('skor_prioritas', 'desc')
             ->orderBy('created_at', 'asc');
@@ -25,14 +25,11 @@ class RiwayatController extends Controller
                     break;
 
                 case 'guru':
-                    // cek apakah guru adalah wali kelas atau guru BK
                     if ($user->guru && $user->guru->role_guru === 'walikelas') {
-                        // wali kelas hanya lihat siswa di kelasnya
                         $query->whereHas('siswa', function ($q) use ($user) {
                             $q->where('kelas_id', $user->guru->kelas_id ?? null);
                         });
                     } elseif ($user->guru && $user->guru->role_guru === 'bk') {
-                        // guru BK bisa lihat semua data
                     }
                     break;
 
@@ -48,8 +45,7 @@ class RiwayatController extends Controller
         }
 
         $riwayatKonseling = $query->get();
-        $kategoriKonseling = KategoriKonseling::all();
 
-        return view('riwayat-konseling.index', compact('riwayatKonseling', 'kategoriKonseling'));
+        return view('riwayat-konseling.index', compact('riwayatKonseling'));
     }
 }
