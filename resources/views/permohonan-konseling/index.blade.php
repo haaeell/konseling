@@ -222,10 +222,10 @@
                                     <select class="form-control" name="riwayat_konseling_skor" required
                                         onchange="document.getElementById('riwayat_konseling_label').value=this.options[this.selectedIndex].text;">
                                         <option value="">Pilih Riwayat Konseling</option>
-                                        <option value="20">Sudah Sering Konseling (0–20)</option>
-                                        <option value="40">Sudah Beberapa Kali (21–50)</option>
-                                        <option value="70">Jarang Pernah (51–80)</option>
-                                        <option value="90">Belum Pernah Konseling (81–100)</option>
+                                        <option value="20">Sudah Sering Konseling</option>
+                                        <option value="40">Sudah Beberapa Kali </option>
+                                        <option value="70">Jarang Pernah</option>
+                                        <option value="90">Belum Pernah Konseling </option>
                                     </select>
                                     <input type="hidden" name="riwayat_konseling_label" id="riwayat_konseling_label">
                                 </div>
