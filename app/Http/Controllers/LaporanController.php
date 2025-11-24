@@ -62,18 +62,44 @@ class LaporanController extends Controller
         $month = $request->month;
         $year  = $request->year;
 
-        $query = PermohonanKonseling::with(['siswa.user'])
-            ->where('status', 'selesai');
+        $query = PermohonanKonseling::where('status', 'selesai')
+            ->when($month, fn($q) => $q->whereMonth('tanggal_pengajuan', $month))
+            ->when($year,  fn($q) => $q->whereYear('tanggal_pengajuan', $year));
 
-        if ($month) $query->whereMonth('tanggal_pengajuan', $month);
-        if ($year)  $query->whereYear('tanggal_pengajuan', $year);
+        // Role filter
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if ($user->role === 'siswa') {
+                $query->where('siswa_id', $user->siswa->id);
+            }
+
+            if ($user->role === 'guru' && $user->guru->role_guru === 'walikelas') {
+                $query->whereHas('siswa', function ($q) use ($user) {
+                    $q->where('kelas_id', $user->guru->kelas_id);
+                });
+            }
+        }
 
         $laporan = $query->get();
-        $total   = $laporan->count();
+        $total = $laporan->count();
 
-        $pdf = Pdf::loadView('laporan.pdf', compact('laporan', 'total', 'month', 'year'))
-            ->setPaper('a4', 'portrait');
+        // Rekap (untuk grafik versi PDF jika mau nanti)
+        $rekap = [
+            'kategori' => $laporan->groupBy('kategori_masalah_label')->map->count(),
+            'urgensi'  => $laporan->groupBy('tingkat_urgensi_label')->map->count(),
+            'dampak'   => $laporan->groupBy('dampak_masalah_label')->map->count(),
+            'riwayat'  => $laporan->groupBy('riwayat_konseling_label')->map->count(),
+        ];
 
-        return $pdf->download('laporan_konseling.pdf');
+        $pdf = Pdf::loadView('laporan.pdf', compact(
+            'laporan',
+            'total',
+            'rekap',
+            'month',
+            'year'
+        ))->setPaper('a4', 'portrait');
+
+        return $pdf->download('laporan_konseling_' . now()->format('Ymd') . '.pdf');
     }
 }

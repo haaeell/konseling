@@ -10,6 +10,13 @@
             <div class="card-header">
                 <h4 class="mb-3"><i class="bi bi-clipboard-data text-primary"></i> Laporan Konseling</h4>
 
+                <div class="col-md-2 mt-2">
+                    <a href="{{ route('laporan.cetak-pdf', ['month' => request('month'), 'year' => request('year')]) }}"
+                        class="btn btn-danger w-100" target="_blank">
+                        <i class="bi bi-file-earmark-pdf"></i> Cetak PDF
+                    </a>
+                </div>
+
                 {{-- FILTER --}}
                 <form action="{{ route('laporan.index') }}" method="GET" class="mb-3">
                     <div class="row g-3">
@@ -44,6 +51,8 @@
                         </div>
                     </div>
                 </form>
+
+
             </div>
 
             <div class="card-body">
