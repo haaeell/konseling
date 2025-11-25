@@ -148,24 +148,9 @@ class SISeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // ====== KATEGORI KONSELING ======
-        $kategoriAkademikId = DB::table('kategori_konseling')->insertGetId([
-            'nama' => 'Akademik',
-            'skor_prioritas' => 70,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('kategori_konseling')->insert([
-            ['nama' => 'Pribadi', 'skor_prioritas' => 60, 'created_at' => now(), 'updated_at' => now()],
-            ['nama' => 'Sosial', 'skor_prioritas' => 50, 'created_at' => now(), 'updated_at' => now()],
-            ['nama' => 'Karir', 'skor_prioritas' => 40, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
         // ====== PERMOHONAN KONSELING (dummy) ======
         DB::table('permohonan_konseling')->insert([
             'siswa_id' => $siswaId,
-            'kategori_id' => $kategoriAkademikId,
             'tanggal_pengajuan' => Carbon::now()->toDateString(),
             'deskripsi_permasalahan' => 'Kesulitan memahami materi Matematika.',
             'status' => 'menunggu',
