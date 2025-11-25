@@ -71,7 +71,15 @@ class PermohonanKonselingController extends Controller
             'kategori_masalah_skor' => 'required|integer',
             'riwayat_konseling_label' => 'required|string',
             'riwayat_konseling_skor' => 'required|integer',
+
+            'siswa_id' => 'required_if:role,guru',
         ]);
+
+        $user = Auth::user();
+
+        $reportType = $user->role === 'siswa' ? 'self' : 'teacher';
+
+        $siswaId = $user->siswa->id ?? $request->siswa_id;
 
         $skorAkhir =
             ($request->tingkat_urgensi_skor * 0.4) +
@@ -80,10 +88,12 @@ class PermohonanKonselingController extends Controller
             ($request->riwayat_konseling_skor * 0.1);
 
         $permohonan = PermohonanKonseling::create([
-            'siswa_id' => Auth::user()->siswa->id ?? $request->siswa_id,
+            'siswa_id' => $siswaId,
             'tanggal_pengajuan' => now(),
             'deskripsi_permasalahan' => $request->deskripsi_permasalahan,
             'status' => 'menunggu',
+
+            'report_type' => $reportType,
 
             'tingkat_urgensi_label' => $request->tingkat_urgensi_label,
             'tingkat_urgensi_skor' => $request->tingkat_urgensi_skor,
@@ -101,17 +111,36 @@ class PermohonanKonselingController extends Controller
         ]);
 
         $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
-        $user = Auth::user()->name;
+        $pengaju = $user->name;
 
         foreach ($guruBk as $guru) {
             $guru->notify(new PermohonanKonselingNotification(
                 $permohonan,
-                "$user mengajukan permohonan konseling."
+                "$pengaju mengajukan permohonan konseling."
             ));
         }
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil diajukan.');
     }
+
+    public function updateJadwal(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal_disetujui' => 'required|date',
+            'tempat' => 'required|string|max:255',
+        ]);
+
+        $jadwal = PermohonanKonseling::findOrFail($id);
+
+        $jadwal->update([
+            'tanggal_disetujui' => $request->tanggal_disetujui,
+            'tempat' => $request->tempat,
+        ]);
+
+        return back()->with('success', 'Jadwal konseling berhasil diperbarui.');
+    }
+
+
 
     public function approve(Request $request, $id)
     {

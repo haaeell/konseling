@@ -66,4 +66,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::patch('/permohonan-konseling/edit-jadwal/{id}', [PermohonanKonselingController::class, 'updateJadwal'])
+        ->name('permohonan-konseling.edit-jadwal');
 });

@@ -11,6 +11,7 @@
                         <thead>
                             <tr>
                                 <th>Siswa</th>
+                                <th>Tipe</th>
                                 <th>Tanggal Pengajuan</th>
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
@@ -22,6 +23,18 @@
                             @foreach ($riwayatKonseling as $jadwal)
                                 <tr data-id="{{ $jadwal->id }}">
                                     <td>{{ $jadwal->siswa->user->name }}</td>
+                                    <td>
+                                        @if ($jadwal->report_type === 'self')
+                                            <span class="text-dark">
+                                                <i class="bi bi-person"></i> Laporan Siswa
+                                            </span>
+                                        @else
+                                            <span class="text-dark">
+                                                <i class="bi bi-person-badge"></i> Laporan Guru
+                                            </span>
+                                        @endif
+                                    </td>
+
                                     <td>{{ \Carbon\Carbon::parse($jadwal->tanggal_pengajuan)->format('d-m-Y') }}</td>
                                     <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
                                     <td>

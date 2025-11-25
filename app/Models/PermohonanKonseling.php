@@ -32,6 +32,7 @@ class PermohonanKonseling extends Model
         'riwayat_konseling_skor',
 
         'skor_prioritas',
+        'report_type',
     ];
 
     // Relasi

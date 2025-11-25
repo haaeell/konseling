@@ -20,7 +20,7 @@
                         <thead>
                             <tr>
                                 <th>Siswa</th>
-                                <th>Kategori</th>
+                                <th>Tipe</th>
                                 <th>Tanggal Pengajuan</th>
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
@@ -34,9 +34,17 @@
                             @foreach ($permohonanKonseling as $permohonan)
                                 <tr data-id="{{ $permohonan->id }}">
                                     <td>{{ $permohonan->siswa->user->name }}</td>
-
-                                    {{-- KATEGORI MASALAH --}}
-                                    <td>{{ $permohonan->kategori_masalah_label }}</td>
+                                    <td>
+                                        @if ($permohonan->report_type === 'self')
+                                            <span class="text-primary">
+                                                <i class="bi bi-person"></i> Laporan Siswa
+                                            </span>
+                                        @else
+                                            <span class="text-dark">
+                                                <i class="bi bi-person-badge"></i> Laporan Guru
+                                            </span>
+                                        @endif
+                                    </td>
 
                                     <td>{{ \Carbon\Carbon::parse($permohonan->tanggal_pengajuan)->format('d-m-Y') }}</td>
 
