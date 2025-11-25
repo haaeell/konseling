@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SISeeder::class,
-            KriteriaPrioritasSeeder::class
         ]);
     }
 }
