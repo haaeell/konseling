@@ -74,8 +74,9 @@
                 <th>Nama Siswa</th>
                 <th>Kelas</th>
                 <th>Kategori</th>
+                <th>Masalah</th>
+                <th>Penyelesaian</th>
                 <th>Konselor</th>
-                <th>Ringkasan</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -88,8 +89,9 @@
                     <td>{{ $row->siswa->user->name }}</td>
                     <td>{{ $row->siswa->kelas->nama }}</td>
                     <td>{{ $row->kategori_masalah_label }}</td>
-                    <td>{{ $row->nama_konselor }}</td>
+                    <td>{{ $row->deskripsi_permasalahan }}</td>
                     <td>{{ $row->rangkuman ?? '-' }}</td>
+                    <td>{{ $row->nama_konselor }}</td>
                     <td class="center">{{ ucfirst($row->status) }}</td>
                 </tr>
             @endforeach

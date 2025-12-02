@@ -65,8 +65,9 @@
                                 <th>Nama Siswa</th>
                                 <th>Kelas</th>
                                 <th>Kategori Konseling</th>
+                                <th>Masalah</th>
+                                <th>Penyelesaian</th>
                                 <th>Nama Konselor</th>
-                                <th>Ringkasan Konseling</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -79,8 +80,9 @@
                                     <td>{{ $row->siswa->user->name }}</td>
                                     <td>{{ $row->siswa->kelas->nama }}</td>
                                     <td>{{ $row->kategori_masalah_label }}</td>
-                                    <td>{{ $row->nama_konselor }}</td>
+                                    <td>{{ Str::limit($row->deskripsi_permasalahan, 50) }}</td>
                                     <td>{{ Str::limit($row->rangkuman ?? '-', 50) }}</td>
+                                    <td>{{ $row->nama_konselor }}</td>
                                     <td>
                                         <span class="badge bg-success">{{ ucfirst($row->status) }}</span>
                                     </td>
@@ -97,7 +99,6 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
     </div>
