@@ -16,7 +16,7 @@
                             </div>
                             <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                 <h6 class="text-muted font-semibold">Total Siswa</h6>
-                                <h6 class="font-extrabold mb-0">{{ $countGuru }}</h6>
+                                <h6 class="font-extrabold mb-0">{{ $countSiswa }}</h6>
                             </div>
                         </div>
                     </div>
@@ -77,17 +77,17 @@
 
         <!-- Bar Chart -->
         <!-- <div class="row mt-4">
-            <div class="col-12">
-                <div class="card shadow-lg">
-                    <div class="card-header">
-                        <h5 class="mb-0">Statistik Pemesanan Bulanan</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="barChart"></canvas>
+                <div class="col-12">
+                    <div class="card shadow-lg">
+                        <div class="card-header">
+                            <h5 class="mb-0">Statistik Pemesanan Bulanan</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="barChart"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
 
     </div>
 @endsection
