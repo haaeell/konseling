@@ -1,164 +1,104 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Laporan Konseling')
-@section('breadcumb', 'Laporan Konseling')
+@section('title', 'Laporan Konseling Siswa')
+@section('breadcumb', 'Laporan Konseling Siswa')
 
 @section('content')
     <div class="container-fluid mt-4">
 
-        <div class="card shadow-lg border-0">
+        <div class="card shadow-sm border-0">
             <div class="card-header">
-                <h4 class="mb-3"><i class="bi bi-clipboard-data text-primary"></i> Laporan Konseling</h4>
+                <h4 class="mb-3">
+                    <i class="bi bi-journal-text text-primary"></i> Laporan Konseling Siswa
+                </h4>
 
-                <div class="col-md-2 mt-2">
-                    <a href="{{ route('laporan.cetak-pdf', ['month' => request('month'), 'year' => request('year')]) }}"
-                        class="btn btn-danger w-100" target="_blank">
-                        <i class="bi bi-file-earmark-pdf"></i> Cetak PDF
-                    </a>
-                </div>
+                <form action="{{ route('laporan.index') }}" method="GET" class="row g-3">
 
-                {{-- FILTER --}}
-                <form action="{{ route('laporan.index') }}" method="GET" class="mb-3">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Bulan</label>
-                            <select name="month" class="form-select">
-                                <option value="">Semua</option>
-                                @foreach (range(1, 12) as $m)
-                                    <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>
-                                        {{ DateTime::createFromFormat('!m', $m)->format('F') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tahun Akademik</label>
+                        <select name="tahun_akademik" class="form-select" required>
+                            @foreach ($tahunAjaranList as $th)
+                                <option value="{{ $th->id }}"
+                                    {{ $request->tahun_akademik == $th->id ? 'selected' : '' }}>
+                                    {{ $th->tahun }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Tahun</label>
-                            <select name="year" class="form-select">
-                                <option value="">Semua</option>
-                                @for ($y = date('Y'); $y >= 2020; $y--)
-                                    <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>
-                                        {{ $y }}
-                                    </option>
-                                @endfor
-                            </select>
-                        </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Kelas Siswa</label>
+                        <select name="kelas" class="form-select">
+                            <option value="">Semua Kelas</option>
+                            @foreach ($kelasList as $k)
+                                <option value="{{ $k->id }}" {{ $request->kelas == $k->id ? 'selected' : '' }}>
+                                    {{ $k->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                        <div class="col-md-2">
-                            <button class="btn btn-primary w-100 mt-4">
-                                <i class="bi bi-search"></i> Tampilkan
-                            </button>
-                        </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Pilih
+                        </button>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a href="{{ route('laporan.pdf', request()->all()) }}" class="btn btn-danger w-100" target="_blank">
+                            <i class="bi bi-file-earmark-pdf"></i> Cetak
+                        </a>
                     </div>
                 </form>
-
-
             </div>
 
             <div class="card-body">
 
-                {{-- STATISTIK TOTAL --}}
-                <div class="row text-center mb-4 d-flex justify-content-center">
-                    <div class="col-md-4">
-                        <div class="card border-danger shadow-sm">
-                            <div class="card-body">
-                                <i class="bi bi-people-fill fs-1 text-danger"></i>
-                                <h6 class="text-secondary mt-2">Total Permohonan Konseling</h6>
-                                <h2 class="fw-bold text-danger">{{ $totalPengajuanKonseling }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 ">
-                        <div class="card border-primary shadow-sm">
-                            <div class="card-body">
-                                <i class="bi bi-people-fill fs-1 text-primary"></i>
-                                <h6 class="text-secondary mt-2">Total Konseling Selesai</h6>
-                                <h2 class="fw-bold text-primary">{{ $total }}</h2>
-                            </div>
-                        </div>
-                    </div>
+                <h5 class="fw-bold mb-3">Data Konseling Siswa</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Nama Siswa</th>
+                                <th>Kelas</th>
+                                <th>Kategori Konseling</th>
+                                <th>Nama Konselor</th>
+                                <th>Ringkasan Konseling</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($laporan as $index => $row)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($row->tanggal_pengajuan)->translatedFormat('d F Y') }}</td>
+                                    <td>{{ $row->siswa->user->name }}</td>
+                                    <td>{{ $row->siswa->kelas->nama }}</td>
+                                    <td>{{ $row->kategori_masalah_label }}</td>
+                                    <td>{{ $row->nama_konselor }}</td>
+                                    <td>{{ Str::limit($row->rangkuman ?? '-', 50) }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ ucfirst($row->status) }}</span>
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                            @if ($laporan->isEmpty())
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">
+                                        Tidak ada data konseling.
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
 
-                {{-- PIE CHART --}}
-                <h5 class="mb-4"><i class="bi bi-pie-chart-fill text-primary"></i> Statistik Faktor Penilaian</h5>
-
-                <div class="row">
-                    {{-- KATEGORI --}}
-                    <div class="col-md-3 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h6 class="text-center fw-bold">Kategori Masalah</h6>
-                                <canvas id="pieKategori"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- URGENSI --}}
-                    <div class="col-md-3 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h6 class="text-center fw-bold">Tingkat Urgensi</h6>
-                                <canvas id="pieUrgensi"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- DAMPAK --}}
-                    <div class="col-md-3 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h6 class="text-center fw-bold">Dampak Masalah</h6>
-                                <canvas id="pieDampak"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- RIWAYAT --}}
-                    <div class="col-md-3 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h6 class="text-center fw-bold">Riwayat Konseling</h6>
-                                <canvas id="pieRiwayat"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-@endsection
-
-@section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        const colors = ['#4e73df', '#1cc88a', '#f6c23e', '#e74a3b', '#36b9cc'];
-
-        const rekap = @json($rekap);
-
-        function buatPie(key, id) {
-            new Chart(document.getElementById(id), {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(rekap[key]),
-                    datasets: [{
-                        data: Object.values(rekap[key]),
-                        backgroundColor: colors
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-
-        buatPie('kategori', 'pieKategori');
-        buatPie('urgensi', 'pieUrgensi');
-        buatPie('dampak', 'pieDampak');
-        buatPie('riwayat', 'pieRiwayat');
-    </script>
 @endsection

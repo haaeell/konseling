@@ -17,6 +17,7 @@ class PermohonanKonseling extends Model
         'alasan_penolakan',
         'tanggal_disetujui',
         'tempat',
+        'nama_konselor',
 
         // Kriteria Penilaian
         'tingkat_urgensi_label',
@@ -33,11 +34,17 @@ class PermohonanKonseling extends Model
 
         'skor_prioritas',
         'report_type',
+        'bukti_masalah',
     ];
 
     // Relasi
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
+    }
+
+    public function guruBk()
+    {
+        return $this->belongsTo(Guru::class, 'approved_by');
     }
 }

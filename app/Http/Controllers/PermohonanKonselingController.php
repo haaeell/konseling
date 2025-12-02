@@ -87,10 +87,17 @@ class PermohonanKonselingController extends Controller
             ($request->kategori_masalah_skor * 0.2) +
             ($request->riwayat_konseling_skor * 0.1);
 
+        $path = null;
+
+        if ($request->hasFile('bukti_masalah')) {
+            $path = $request->file('bukti_masalah')->store('bukti-masalah', 'public');
+        }
+
         $permohonan = PermohonanKonseling::create([
             'siswa_id' => $siswaId,
             'tanggal_pengajuan' => now(),
             'deskripsi_permasalahan' => $request->deskripsi_permasalahan,
+            'bukti_masalah' => $path,
             'status' => 'menunggu',
 
             'report_type' => $reportType,
@@ -158,6 +165,7 @@ class PermohonanKonselingController extends Controller
             'status' => 'disetujui',
             'tanggal_disetujui' => $request->tanggal_disetujui,
             'tempat' => $request->tempat,
+            'nama_konselor' => Auth::user()->name,
         ]);
 
         $user = $permohonan->siswa->user;
@@ -186,7 +194,6 @@ class PermohonanKonselingController extends Controller
 
     public function complete(Request $request, $id)
     {
-        // Cek apakah user adalah guru dengan role BK
         if (Auth::user()->role !== 'guru' || !Auth::user()->guru || Auth::user()->guru->role_guru !== 'bk') {
             return redirect()->back()->with('error', 'Hanya guru BK yang dapat menyelesaikan permohonan.');
         }
@@ -199,6 +206,7 @@ class PermohonanKonselingController extends Controller
         $permohonan->update([
             'status' => 'selesai',
             'rangkuman' => $request->rangkuman,
+            'nama_konselor' => Auth::user()->name,
         ]);
 
         // Kirim notifikasi ke siswa

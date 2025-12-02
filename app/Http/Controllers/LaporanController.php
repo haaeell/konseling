@@ -4,102 +4,73 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PermohonanKonseling;
-use App\Models\Siswa;
-use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\TahunAkademik;
+use App\Models\Kelas;
 
 class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        $month = $request->month;
-        $year  = $request->year;
+        $tahunAjaranList = TahunAkademik::orderBy('tahun', 'desc')->get();
+        $kelasList = Kelas::with('tahunAkademik')->orderBy('nama')->get();
 
-        // Query dasar
-        $query = PermohonanKonseling::where('status', 'selesai')
-            ->when($month, fn($q) => $q->whereMonth('tanggal_pengajuan', $month))
-            ->when($year,  fn($q) => $q->whereYear('tanggal_pengajuan', $year));
+        $query = PermohonanKonseling::with([
+            'siswa.user',
+            'siswa.kelas',
+            'guruBk.user'
+        ])->where('status', 'selesai');
 
-        // ⛔ FILTER ROLE
-        if (Auth::check()) {
-            $user = Auth::user();
+        if ($request->tahun_akademik) {
+            $query->whereHas('siswa.kelas', function ($q) use ($request) {
+                $q->where('tahun_akademik_id', $request->tahun_akademik);
+            });
+        }
 
-            if ($user->role === 'siswa') {
-                $query->where('siswa_id', $user->siswa->id);
-            }
-
-            if ($user->role === 'guru' && $user->guru->role_guru === 'walikelas') {
-                $query->whereHas('siswa', function ($q) use ($user) {
-                    $q->where('kelas_id', $user->guru->kelas_id);
-                });
-            }
+        if ($request->kelas) {
+            $query->whereHas('siswa', function ($q) use ($request) {
+                $q->where('kelas_id', $request->kelas);
+            });
         }
 
         $laporan = $query->get();
-        $total = $laporan->count();
-        $totalPengajuanKonseling = PermohonanKonseling::where('status', 'menunggu')->count();
 
-        // 📊 REKAP (group by label → hitung)
-        $rekap = [
-            'kategori' => $laporan->groupBy('kategori_masalah_label')->map->count(),
-            'urgensi'  => $laporan->groupBy('tingkat_urgensi_label')->map->count(),
-            'dampak'   => $laporan->groupBy('dampak_masalah_label')->map->count(),
-            'riwayat'  => $laporan->groupBy('riwayat_konseling_label')->map->count(),
-        ];
-
-        return view('laporan.index', compact(
-            'laporan',
-            'total',
-            'rekap',
-            'month',
-            'year',
-            'totalPengajuanKonseling'
-        ));
+        return view('laporan.index', [
+            'laporan' => $laporan,
+            'tahunAjaranList' => $tahunAjaranList,
+            'kelasList' => $kelasList,
+            'request' => $request
+        ]);
     }
 
     public function cetakPdf(Request $request)
     {
-        $month = $request->month;
-        $year  = $request->year;
+        $tahunAjaranList = TahunAkademik::orderBy('tahun', 'desc')->get();
 
-        $query = PermohonanKonseling::where('status', 'selesai')
-            ->when($month, fn($q) => $q->whereMonth('tanggal_pengajuan', $month))
-            ->when($year,  fn($q) => $q->whereYear('tanggal_pengajuan', $year));
+        $query = PermohonanKonseling::with([
+            'siswa.user',
+            'siswa.kelas'
+        ])->where('status', 'selesai');
 
-        // Role filter
-        if (Auth::check()) {
-            $user = Auth::user();
+        if ($request->tahun_akademik) {
+            $query->whereHas('siswa.kelas', function ($q) use ($request) {
+                $q->where('tahun_akademik_id', $request->tahun_akademik);
+            });
+        }
 
-            if ($user->role === 'siswa') {
-                $query->where('siswa_id', $user->siswa->id);
-            }
-
-            if ($user->role === 'guru' && $user->guru->role_guru === 'walikelas') {
-                $query->whereHas('siswa', function ($q) use ($user) {
-                    $q->where('kelas_id', $user->guru->kelas_id);
-                });
-            }
+        if ($request->kelas) {
+            $query->whereHas('siswa', function ($q) use ($request) {
+                $q->where('kelas_id', $request->kelas);
+            });
         }
 
         $laporan = $query->get();
-        $total = $laporan->count();
 
-        // Rekap (untuk grafik versi PDF jika mau nanti)
-        $rekap = [
-            'kategori' => $laporan->groupBy('kategori_masalah_label')->map->count(),
-            'urgensi'  => $laporan->groupBy('tingkat_urgensi_label')->map->count(),
-            'dampak'   => $laporan->groupBy('dampak_masalah_label')->map->count(),
-            'riwayat'  => $laporan->groupBy('riwayat_konseling_label')->map->count(),
-        ];
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('laporan.pdf', [
+            'laporan' => $laporan,
+            'request' => $request,
+            'tahunAjaranList' => $tahunAjaranList
+        ])->setPaper('a4', 'portrait');
 
-        $pdf = Pdf::loadView('laporan.pdf', compact(
-            'laporan',
-            'total',
-            'rekap',
-            'month',
-            'year'
-        ))->setPaper('a4', 'portrait');
-
-        return $pdf->download('laporan_konseling_' . now()->format('Ymd') . '.pdf');
+        return $pdf->stream('laporan_konseling_' . now()->format('Ymd') . '.pdf');
     }
 }

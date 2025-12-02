@@ -25,6 +25,7 @@
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
                                 <th>Skor Prioritas</th>
+                                <th>Bukti</th>
                                 @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'bk')
                                     <th>Aksi</th>
                                 @endif
@@ -111,6 +112,39 @@
                                             @endif
                                         </td>
                                     @endif
+                                    <td>
+                                        @if ($permohonan->bukti_masalah)
+                                            @php
+                                                $ext = strtolower(
+                                                    pathinfo($permohonan->bukti_masalah, PATHINFO_EXTENSION),
+                                                );
+                                            @endphp
+
+                                            {{-- FOTO --}}
+                                            @if (in_array($ext, ['jpg', 'jpeg', 'png']))
+                                                <a href="{{ asset('storage/' . $permohonan->bukti_masalah) }}"
+                                                    target="_blank">
+                                                    <img src="{{ asset('storage/' . $permohonan->bukti_masalah) }}"
+                                                        width="60" class="img-thumbnail">
+                                                </a>
+
+                                                {{-- VIDEO --}}
+                                            @elseif (in_array($ext, ['mp4', 'mov', 'avi']))
+                                                <video width="100" controls>
+                                                    <source src="{{ asset('storage/' . $permohonan->bukti_masalah) }}">
+                                                </video>
+
+                                                {{-- FILE LAIN --}}
+                                            @else
+                                                <a href="{{ asset('storage/' . $permohonan->bukti_masalah) }}"
+                                                    class="btn btn-info btn-sm" target="_blank">
+                                                    <i class="bi bi-eye"></i> Lihat File
+                                                </a>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -131,7 +165,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
-                    <form method="POST" action="{{ route('permohonan-konseling.store') }}">
+                    <form method="POST" action="{{ route('permohonan-konseling.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <div class="modal-body">
@@ -193,7 +227,6 @@
                             </div>
 
                             {{-- Kategori Masalah --}}
-                            {{-- Kategori Masalah --}}
                             <div class="mb-3">
                                 <label class="form-label">
                                     Kategori Masalah
@@ -249,6 +282,16 @@
                                 </div>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">Upload Bukti Masalah (Foto/Video) <span
+                                        class="text-muted">(Opsional)</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-paperclip"></i></span>
+                                    <input type="file" class="form-control" name="bukti_masalah"
+                                        accept="image/*,video/*">
+                                </div>
+                                <small class="text-muted">Format yang didukung: JPG, PNG, MP4, MOV. Tidak wajib.</small>
+                            </div>
                         </div>
 
                         <div class="modal-footer">
