@@ -47,11 +47,15 @@
                 <td><strong>Tahun Akademik</strong></td>
                 <td>
                     @php
-                        $tahun = $tahunAjaranList->where('id', $request->tahun_akademik)->first();
+                        $tahun = $request->tahun_akademik
+                            ? $tahunAjaranList->firstWhere('id', $request->tahun_akademik)
+                            : $tahunAjaranList->first();
                     @endphp
+
                     {{ $tahun->tahun ?? '-' }}
                 </td>
             </tr>
+
 
             <tr>
                 <td><strong>Kelas</strong></td>
