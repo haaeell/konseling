@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JadwalKonselingController;
 use App\Http\Controllers\KategoriKonselingController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\ManajemenUserController;
 use App\Http\Controllers\OrangtuaController;
 use App\Http\Controllers\PermohonanKonselingController;
 use App\Http\Controllers\RiwayatController;
@@ -70,4 +71,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::patch('/permohonan-konseling/edit-jadwal/{id}', [PermohonanKonselingController::class, 'updateJadwal'])
         ->name('permohonan-konseling.edit-jadwal');
+
+    Route::get('/manajemen-user', [ManajemenUserController::class, 'index'])
+        ->name('manajemen-user.index');
+
+    Route::post('/manajemen-user/{user}/reset-password', [ManajemenUserController::class, 'resetPassword'])
+        ->name('manajemen-user.reset-password');
 });

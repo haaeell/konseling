@@ -81,6 +81,15 @@
                     <span>Laporan</span>
                 </a>
             </li>
+
+            {{-- MANAJEMEN USER --}}
+            <li class="sidebar-item {{ request()->is('manajemen-user*') ? 'active' : '' }}">
+                <a href="/manajemen-user" class="sidebar-link d-flex align-items-center gap-2">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Manajemen User</span>
+                </a>
+            </li>
+
         @endif
 
 

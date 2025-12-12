@@ -56,7 +56,6 @@
                 </td>
             </tr>
 
-
             <tr>
                 <td><strong>Kelas</strong></td>
                 <td>

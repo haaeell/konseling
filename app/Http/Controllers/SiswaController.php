@@ -37,7 +37,7 @@ class SiswaController extends Controller
 
         $userSiswa = User::create([
             'name' => $request->name,
-            'email' => $request->nis . '@smanja.ac.id',
+            'email' => $request->nis . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'siswa',
         ]);
@@ -45,7 +45,7 @@ class SiswaController extends Controller
 
         $userOrangtua = User::create([
             'name' => $request->nama_orangtua,
-            'email' => 'ortu_' . $request->nis . '@smanja.ac.id',
+            'email' => 'ortu_' . $request->nis . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'orangtua',
         ]);
@@ -110,7 +110,7 @@ class SiswaController extends Controller
 
         $userSiswa->update([
             'name' => $request->name,
-            'email' => $request->nis . '@smanja.ac.id',
+            'email' => $request->nis . '@smanja.sch.id',
         ]);
 
         $siswa->update([
@@ -126,7 +126,7 @@ class SiswaController extends Controller
         if ($orangtua && $userOrangtua) {
             $userOrangtua->update([
                 'name' => $request->nama_orangtua,
-                'email' => 'ortu_' . $request->nis . '@smanja.ac.id',
+                'email' => 'ortu_' . $request->nis . '@smanja.sch.id',
             ]);
 
             $orangtua->update([

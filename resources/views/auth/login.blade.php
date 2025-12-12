@@ -109,7 +109,9 @@
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">Remember Me</label>
                     </div>
-                    <a href="#">Forgot Password?</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                        Lapor Lupa Password
+                    </a>
                 </div>
 
                 <!-- Button -->
@@ -117,6 +119,70 @@
             </form>
 
         </div>
+
+        <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Laporkan Lupa Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body text-start">
+                        <p>
+                            Jika Anda tidak dapat masuk ke akun karena lupa password, silakan laporkan kendala tersebut
+                            agar dapat segera dibantu pemulihannya.
+                        </p>
+
+                        <p class="fw-semibold mb-1">Untuk proses verifikasi dan reset password, hubungi:</p>
+                        <ul>
+                            <li><strong>BK — Bapak Suraji</strong></li>
+                            <a href="https://wa.me/6285327806848?text=Halo%20Pak%20Suraji,%0A%0ASaya%20ingin%20melaporkan%20lupa%20password%20akun%20SI-BK.%0A%0A*Jenis%20Akun:*%20(Siswa%20/%20Orang%20Tua%20/%20Guru)%0A*Nama%20Lengkap:*%20%0A*NIS:*%20%0A*Kelas:*%20%0A*Email%20Login:*%20%0A*Masalah:*%20%0A%0ATerima%20kasih."
+                                target="_blank" class="btn btn-success">
+                                <i class="bi bi-whatsapp"></i> Hubungi via WhatsApp
+                            </a>
+
+                        </ul>
+
+                        <hr>
+
+                        <p class="fw-semibold">Saat mengirim laporan, sertakan informasi berikut:</p>
+
+                        <p class="fw-bold mb-1">Akun Siswa:</p>
+                        <ul>
+                            <li>Nama lengkap</li>
+                            <li>NIS</li>
+                            <li>Kelas</li>
+                            <li>Email yang digunakan untuk login</li>
+                            <li>Penjelasan singkat masalah</li>
+                        </ul>
+
+                        <p class="fw-bold mb-1">Akun Orang Tua:</p>
+                        <ul>
+                            <li>Nama lengkap siswa (anak)</li>
+                            <li>NIS siswa (anak)</li>
+                            <li>Email yang digunakan untuk login</li>
+                            <li>Penjelasan singkat masalah</li>
+                        </ul>
+
+                        <p class="fw-bold mb-1">Guru dan Kepala Sekolah:</p>
+                        <p>
+                            Dapat langsung dikomunikasikan dengan <strong>Bapak Suraji</strong>.
+                        </p>
+
+                        <p class="mt-3 text-muted">
+                            Tim BK akan memverifikasi data Anda dan membantu memulihkan akses akun.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
             // Toggle password visibility

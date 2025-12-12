@@ -34,7 +34,7 @@ class SISeeder extends Seeder
         // User siswa
         $userSiswaId = DB::table('users')->insertGetId([
             'name' => $namaSiswa,
-            'email' => $nis . '@smanja.ac.id',
+            'email' => $nis . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'created_at' => now(),
@@ -44,7 +44,7 @@ class SISeeder extends Seeder
         // User orangtua
         $userOrtuId = DB::table('users')->insertGetId([
             'name' => $namaOrtu,
-            'email' => 'ortu_' . $nis . '@smanja.ac.id',
+            'email' => 'ortu_' . $nis . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'orangtua',
             'created_at' => now(),
@@ -81,7 +81,7 @@ class SISeeder extends Seeder
         $namaGuru = 'Bu Siti';
         $userGuruId = DB::table('users')->insertGetId([
             'name' => $namaGuru,
-            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.ac.id',
+            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'guru',
             'created_at' => now(),
@@ -104,7 +104,7 @@ class SISeeder extends Seeder
         $namaGuru = 'Eko Adinuryadin';
         $userGuruId = DB::table('users')->insertGetId([
             'name' => $namaGuru,
-            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.ac.id',
+            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'guru',
             'created_at' => now(),
@@ -128,7 +128,7 @@ class SISeeder extends Seeder
         $namaGuru = 'Suraji';
         $userGuruId = DB::table('users')->insertGetId([
             'name' => $namaGuru,
-            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.ac.id',
+            'email' => 'guru_' . strtolower(str_replace(' ', '', $namaGuru)) . '@smanja.sch.id',
             'password' => Hash::make('password'),
             'role' => 'guru',
             'created_at' => now(),
