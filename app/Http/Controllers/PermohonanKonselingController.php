@@ -73,6 +73,7 @@ class PermohonanKonselingController extends Controller
             'riwayat_konseling_skor' => 'required|integer',
 
             'siswa_id' => 'required_if:role,guru',
+            'bukti_masalah' => 'nullable|file|mimes:jpg,jpeg,png,pdf,mp4,mov,avi,webm|max:10240',
         ]);
 
         $user = Auth::user();
