@@ -216,6 +216,32 @@ class PermohonanKonselingController extends Controller
         return redirect()->back()->with('success', 'Permohonan konseling berhasil disetujui.');
     }
 
+    public function getRiwayatKonseling($siswaId)
+    {
+        $jumlahRiwayat = PermohonanKonseling::where('siswa_id', $siswaId)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', 'selesai')
+            ->count();
+
+        if ($jumlahRiwayat > 3) {
+            $riwayatNama = 'Sudah Sering Konseling';
+            $riwayatSkor = 20;
+        } elseif ($jumlahRiwayat >= 1) {
+            $riwayatNama = 'Sudah Beberapa Kali';
+            $riwayatSkor = 40;
+        } else {
+            $riwayatNama = 'Belum Pernah Konseling';
+            $riwayatSkor = 90;
+        }
+
+        return response()->json([
+            'jumlah' => $jumlahRiwayat,
+            'nama' => $riwayatNama,
+            'skor' => $riwayatSkor
+        ]);
+    }
+
     public function reject(Request $request, $id)
     {
         if (Auth::user()->role !== 'guru' || !Auth::user()->guru || Auth::user()->guru->role_guru !== 'bk') {

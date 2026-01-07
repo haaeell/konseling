@@ -173,7 +173,7 @@
                                     <label class="form-label">Siswa</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <select class="form-control" name="siswa_id" required>
+                                        <select class="form-control" name="siswa_id" id="siswa_id" required>
                                             <option value="">Pilih Siswa</option>
                                             @foreach ($siswaWali as $siswa)
                                                 <option value="{{ $siswa->id }}">{{ $siswa->user->name }} -
@@ -202,52 +202,38 @@
                                     <div class="mb-3">
                                         <label class="form-label">{{ $k->nama }}</label>
 
-                                        {{-- SELECT READONLY --}}
-                                        <select class="form-control" disabled>
-                                            <option selected>
-                                                {{ $riwayatNama }} ({{ $riwayatSkor }})
-                                            </option>
+                                        <select class="form-control" id="riwayat_konseling_display" disabled>
+                                            <option>Silakan pilih siswa</option>
                                         </select>
 
-                                        {{-- ALERT INFORMASI --}}
-                                        <div class="alert alert-info mt-2 mb-0 py-2 small">
-                                            <i class="bi bi-info-circle-fill"></i>
-                                            <strong>Informasi Riwayat Konseling</strong>
-
-                                            <div class="mt-1">
-                                                Anda telah melakukan:
-                                                <span class="badge bg-primary">
-                                                    {{ $jumlahRiwayat }} kali
-                                                </span>
-                                                konseling pada bulan ini.
-                                            </div>
-
-                                            <hr class="my-2">
-
+                                        <div class="alert alert-info mt-2 small" id="riwayat_info" style="display:none">
                                             <div>
-                                                Nilai ditentukan otomatis berdasarkan aturan berikut:
-                                                <ul class="mb-0 ps-3">
-                                                    <li>
-                                                        <strong>0 kali</strong> →
-                                                        Belum Pernah Konseling
-                                                    </li>
-                                                    <li>
-                                                        <strong>1–3 kali</strong> →
-                                                        Sudah Beberapa Kali
-                                                    </li>
-                                                    <li>
-                                                        <strong>> 3 kali</strong> →
-                                                        Sudah Sering Konseling
-                                                    </li>
-                                                </ul>
+                                                Jumlah konseling bulan ini:
+                                                <span class="badge bg-primary" id="jumlah_riwayat">0</span>
+                                                <hr class="my-2">
+
+                                                <div>
+                                                    Nilai ditentukan otomatis berdasarkan aturan berikut:
+                                                    <ul class="mb-0 ps-3">
+                                                        <li>
+                                                            <strong>0 kali</strong> →
+                                                            Belum Pernah Konseling
+                                                        </li>
+                                                        <li>
+                                                            <strong>1–3 kali</strong> →
+                                                            Sudah Beberapa Kali
+                                                        </li>
+                                                        <li>
+                                                            <strong>> 3 kali</strong> →
+                                                            Sudah Sering Konseling
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
 
-
-                                        <input type="hidden" name="kriteria[{{ $k->id }}]"
-                                            value="{{ $riwayatSkor }}">
-                                        <input type="hidden" name="sub_kriteria[{{ $k->id }}]"
-                                            value="{{ $riwayatNama }}">
+                                        <input type="hidden" name="kriteria[{{ $k->id }}]" id="riwayat_skor">
+                                        <input type="hidden" name="sub_kriteria[{{ $k->id }}]" id="riwayat_nama">
                                     </div>
                                 @else
                                     <div class="mb-3">
@@ -406,6 +392,34 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            function loadRiwayat(siswaId) {
+                $.get('/ajax/riwayat-konseling/' + siswaId, function(res) {
+
+                    $('#riwayat_konseling_display').html(
+                        `<option>${res.nama} (${res.skor})</option>`
+                    );
+
+                    $('#jumlah_riwayat').text(res.jumlah);
+                    $('#riwayat_info').show();
+
+                    $('#riwayat_skor').val(res.skor);
+                    $('#riwayat_nama').val(res.nama);
+                });
+            }
+
+            @if (auth()->user()->role === 'siswa')
+                // AUTO LOAD UNTUK SISWA
+                loadRiwayat({{ auth()->user()->siswa->id }});
+            @endif
+
+            @if (auth()->user()->role === 'guru' && auth()->user()->guru->role_guru === 'walikelas')
+                // LOAD SAAT PILIH SISWA
+                $('#siswa_id').on('change', function() {
+                    let siswaId = $(this).val();
+                    if (siswaId) loadRiwayat(siswaId);
+                });
+            @endif
+
             $('.approve-permohonan').on('click', function() {
                 $('#approveForm').attr('action', "{{ url('permohonan-konseling/approve') }}/" + $(this)
                     .data('id'));

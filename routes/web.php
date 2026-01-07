@@ -89,4 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/sub/{id}', [KriteriaController::class, 'updateSub'])->name('subkriteria.update');
         Route::delete('/sub/{id}', [KriteriaController::class, 'destroySub'])->name('subkriteria.destroy');
     });
+
+    Route::get('/ajax/riwayat-konseling/{siswa}', [PermohonanKonselingController::class, 'getRiwayatKonseling'])
+        ->middleware('auth');
 });
