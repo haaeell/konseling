@@ -13,8 +13,7 @@ class RiwayatController extends Controller
     {
         $query = PermohonanKonseling::with(['siswa.user'])
             ->whereIn('status', ['selesai', 'ditolak'])
-            ->orderBy('skor_prioritas', 'desc')
-            ->orderBy('created_at', 'asc');
+            ->orderBy('created_at', 'desc');
 
         if (Auth::check()) {
             $user = Auth::user();

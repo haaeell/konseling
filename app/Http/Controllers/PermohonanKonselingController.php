@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
 use App\Models\User;
+use Carbon\Carbon;
 
 class PermohonanKonselingController extends Controller
 {
@@ -138,17 +139,31 @@ class PermohonanKonselingController extends Controller
             'tempat' => 'required|string|max:255',
         ]);
 
-        $jadwal = PermohonanKonseling::findOrFail($id);
+        $permohonan = PermohonanKonseling::findOrFail($id);
 
-        $jadwal->update([
+        $permohonan->update([
             'tanggal_disetujui' => $request->tanggal_disetujui,
             'tempat' => $request->tempat,
         ]);
 
+        $pesan = 'Jadwal konseling Anda telah diperbarui. '
+            . 'Tanggal: ' . Carbon::parse($request->tanggal_disetujui)->format('d M Y')
+            . ', Tempat: ' . $request->tempat;
+
+        Notification::send(
+            $permohonan->siswa->user,
+            new PermohonanKonselingNotification($permohonan, $pesan)
+        );
+
+        if ($permohonan->siswa->orangtua && $permohonan->siswa->orangtua->user) {
+            Notification::send(
+                $permohonan->siswa->orangtua->user,
+                new PermohonanKonselingNotification($permohonan, $pesan)
+            );
+        }
+
         return back()->with('success', 'Jadwal konseling berhasil diperbarui.');
     }
-
-
 
     public function approve(Request $request, $id)
     {
@@ -210,7 +225,6 @@ class PermohonanKonselingController extends Controller
             'nama_konselor' => Auth::user()->name,
         ]);
 
-        // Kirim notifikasi ke siswa
         $user = $permohonan->siswa->user;
         Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah selesai.'));
 
