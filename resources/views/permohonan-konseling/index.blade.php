@@ -76,16 +76,14 @@
                                     <td>
                                         <strong>{{ $permohonan->skor_prioritas }}</strong>
                                         <div class="text-muted small">
-                                            <div>Urgensi: {{ $permohonan->tingkat_urgensi_label }}
-                                                ({{ $permohonan->tingkat_urgensi_skor }})</div>
-                                            <div>Dampak: {{ $permohonan->dampak_masalah_label }}
-                                                ({{ $permohonan->dampak_masalah_skor }})</div>
-                                            <div>Kategori: {{ $permohonan->kategori_masalah_label }}
-                                                ({{ $permohonan->kategori_masalah_skor }})</div>
-                                            <div>Riwayat: {{ $permohonan->riwayat_konseling_label }}
-                                                ({{ $permohonan->riwayat_konseling_skor }})</div>
+                                            @foreach ($permohonan->permohonanKriteria as $pk)
+                                                <div>{{ $pk->kriteria_nama }}: {{ $pk->sub_kriteria_nama }}
+                                                    ({{ $pk->skor }})
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </td>
+
 
                                     @if (auth()->user()->role === 'guru' && auth()->user()->guru && auth()->user()->guru->role_guru === 'bk')
                                         <td>
@@ -185,94 +183,89 @@
                                     </div>
                                 </div>
                             @endif
+                            @php
 
-                            {{-- Tingkat Urgensi --}}
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Tingkat Urgensi
-                                </label>
+                                if ($jumlahRiwayat > 3) {
+                                    $riwayatNama = 'Sudah Sering Konseling';
+                                    $riwayatSkor = 20;
+                                } elseif ($jumlahRiwayat >= 1) {
+                                    $riwayatNama = 'Sudah Beberapa Kali';
+                                    $riwayatSkor = 40;
+                                } else {
+                                    $riwayatNama = 'Belum Pernah Konseling';
+                                    $riwayatSkor = 90;
+                                }
+                            @endphp
 
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lightning-charge"></i></span>
-                                    <select class="form-control" name="tingkat_urgensi_skor" required
-                                        onchange="document.getElementById('tingkat_urgensi_label').value=this.options[this.selectedIndex].text;">
-                                        <option value="">Pilih Tingkat Urgensi</option>
-                                        <option value="20">Tidak Mendesak</option>
-                                        <option value="40">Sedang Mendesak </option>
-                                        <option value="70">Mendesak </option>
-                                        <option value="90">Sangat Mendesak</option>
-                                    </select>
-                                    <input type="hidden" name="tingkat_urgensi_label" id="tingkat_urgensi_label">
-                                </div>
-                            </div>
+                            @foreach ($kriteria as $k)
+                                @if ($k->nama === 'Riwayat Konseling')
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ $k->nama }}</label>
 
-                            {{-- Dampak Masalah --}}
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Dampak Masalah
-                                </label>
+                                        {{-- SELECT READONLY --}}
+                                        <select class="form-control" disabled>
+                                            <option selected>
+                                                {{ $riwayatNama }} ({{ $riwayatSkor }})
+                                            </option>
+                                        </select>
 
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-bar-chart"></i></span>
-                                    <select class="form-control" name="dampak_masalah_skor" required
-                                        onchange="document.getElementById('dampak_masalah_label').value=this.options[this.selectedIndex].text;">
-                                        <option value="">Pilih Dampak Masalah</option>
-                                        <option value="20">Dampak Kecil</option>
-                                        <option value="40">Dampak Sedang</option>
-                                        <option value="70">Dampak Besar</option>
-                                        <option value="90">Dampak Sangat Besar </option>
-                                    </select>
-                                    <input type="hidden" name="dampak_masalah_label" id="dampak_masalah_label">
-                                </div>
-                            </div>
+                                        {{-- ALERT INFORMASI --}}
+                                        <div class="alert alert-info mt-2 mb-0 py-2 small">
+                                            <i class="bi bi-info-circle-fill"></i>
+                                            <strong>Informasi Riwayat Konseling</strong>
 
-                            {{-- Kategori Masalah --}}
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Kategori Masalah
-                                </label>
+                                            <div class="mt-1">
+                                                Anda telah melakukan:
+                                                <span class="badge bg-primary">
+                                                    {{ $jumlahRiwayat }} kali
+                                                </span>
+                                                konseling pada bulan ini.
+                                            </div>
 
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-layers"></i></span>
-                                    <select class="form-control" name="kategori_masalah_skor" required
-                                        onchange="document.getElementById('kategori_masalah_label').value=this.options[this.selectedIndex].text;">
+                                            <hr class="my-2">
 
-                                        <option value="">Pilih Kategori Masalah</option>
-
-                                        {{-- Akademik --}}
-                                        <option value="20">Akademik</option>
-                                        <option value="40">Karir</option>
-                                        <option value="70">Pribadi</option>
-                                        <option value="90">Sosial</option>
-
-                                    </select>
-
-                                    <input type="hidden" name="kategori_masalah_label" id="kategori_masalah_label">
-                                </div>
-                            </div>
+                                            <div>
+                                                Nilai ditentukan otomatis berdasarkan aturan berikut:
+                                                <ul class="mb-0 ps-3">
+                                                    <li>
+                                                        <strong>0 kali</strong> →
+                                                        Belum Pernah Konseling
+                                                    </li>
+                                                    <li>
+                                                        <strong>1–3 kali</strong> →
+                                                        Sudah Beberapa Kali
+                                                    </li>
+                                                    <li>
+                                                        <strong>> 3 kali</strong> →
+                                                        Sudah Sering Konseling
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
 
 
-                            {{-- Riwayat Konseling --}}
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Riwayat Konseling
-                                </label>
+                                        <input type="hidden" name="kriteria[{{ $k->id }}]"
+                                            value="{{ $riwayatSkor }}">
+                                        <input type="hidden" name="sub_kriteria[{{ $k->id }}]"
+                                            value="{{ $riwayatNama }}">
+                                    </div>
+                                @else
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ $k->nama }}</label>
+                                        <select class="form-control" name="kriteria[{{ $k->id }}]" required
+                                            onchange="document.getElementById('label_{{ $k->id }}').value=this.options[this.selectedIndex].text">
+                                            <option value="">Pilih {{ $k->nama }}</option>
+                                            @foreach ($k->subKriteria as $sub)
+                                                <option value="{{ $sub->skor }}">{{ $sub->nama_sub }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="sub_kriteria[{{ $k->id }}]"
+                                            id="label_{{ $k->id }}">
+                                    </div>
+                                @endif
+                            @endforeach
 
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-clock-history"></i></span>
-                                    <select class="form-control" name="riwayat_konseling_skor" required
-                                        onchange="document.getElementById('riwayat_konseling_label').value=this.options[this.selectedIndex].text;">
-                                        <option value="">Pilih Riwayat Konseling</option>
-                                        <option value="20">Sudah Sering Konseling</option>
-                                        <option value="40">Sudah Beberapa Kali </option>
-                                        <option value="70">Jarang Pernah</option>
-                                        <option value="90">Belum Pernah Konseling </option>
-                                    </select>
-                                    <input type="hidden" name="riwayat_konseling_label" id="riwayat_konseling_label">
-                                </div>
-                            </div>
 
-                            {{-- Deskripsi --}}
                             <div class="mb-3">
                                 <label class="form-label">Deskripsi Permasalahan</label>
                                 <div class="input-group">

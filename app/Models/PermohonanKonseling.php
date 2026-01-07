@@ -47,4 +47,9 @@ class PermohonanKonseling extends Model
     {
         return $this->belongsTo(Guru::class, 'approved_by');
     }
+
+    public function permohonanKriteria()
+    {
+        return $this->hasMany(PermohonanKriteria::class, 'permohonan_konseling_id');
+    }
 }

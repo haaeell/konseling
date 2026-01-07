@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JadwalKonselingController;
 use App\Http\Controllers\KategoriKonselingController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\ManajemenUserController;
 use App\Http\Controllers\OrangtuaController;
 use App\Http\Controllers\PermohonanKonselingController;
@@ -77,4 +78,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/manajemen-user/{user}/reset-password', [ManajemenUserController::class, 'resetPassword'])
         ->name('manajemen-user.reset-password');
+
+    Route::prefix('kriteria')->group(function () {
+        Route::get('/', [KriteriaController::class, 'index'])->name('kriteria.index');
+        Route::post('/', [KriteriaController::class, 'store'])->name('kriteria.store');
+        Route::put('/{id}', [KriteriaController::class, 'update'])->name('kriteria.update');
+        Route::delete('/{id}', [KriteriaController::class, 'destroy'])->name('kriteria.destroy');
+
+        Route::post('/sub', [KriteriaController::class, 'storeSub'])->name('subkriteria.store');
+        Route::put('/sub/{id}', [KriteriaController::class, 'updateSub'])->name('subkriteria.update');
+        Route::delete('/sub/{id}', [KriteriaController::class, 'destroySub'])->name('subkriteria.destroy');
+    });
 });

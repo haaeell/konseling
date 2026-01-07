@@ -18,7 +18,7 @@ return new class extends Migration
         // Tabel Sub Kriteria (Pilihan dropdown-nya)
         Schema::create('sub_kriterias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kriteria_id')->constrained('kriterias')->onDelete('cascade');
+            $table->foreignId('kriteria_id')->constrained('kriteria')->onDelete('cascade');
             $table->string('nama_sub'); // Contoh: Sangat Mendesak
             $table->integer('skor');    // 90, 70, dst
             $table->timestamps();

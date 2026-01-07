@@ -39,9 +39,10 @@
                     <li class="submenu-item {{ request()->is('siswa') ? 'active' : '' }}">
                         <a href="/siswa">Siswa</a>
                     </li>
-                    {{-- <li class="submenu-item {{ request()->is('kategori-konseling') ? 'active' : '' }}">
-                        <a href="/kategori-konseling">Kategori Konseling</a>
-                    </li> --}}
+                    <li>
+                        <a href="{{ route('kriteria.index') }}">Kriteria & Sub Kriteria</a>
+                    </li>
+
                 </ul>
             </li>
 

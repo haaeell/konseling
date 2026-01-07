@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guru;
 use App\Models\PermohonanKonseling;
 use App\Models\KategoriKonseling;
+use App\Models\Kriteria;
+use App\Models\PermohonanKriteria;
 use App\Models\Siswa;
+use App\Models\SubKriteria;
 use App\Notifications\PermohonanKonselingNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,11 +55,26 @@ class PermohonanKonselingController extends Controller
 
         $permohonanKonseling = $query->get();
         $kategoriKonseling = KategoriKonseling::all();
+        $kriteria = Kriteria::all();
+
+
+
+        $startDate = Carbon::now()->subMonth()->startOfDay();
+
+        $jumlahRiwayat = PermohonanKonseling::where(
+            'siswa_id',
+            auth()->user()->siswa->id ?? null,
+        )
+            ->where('status', 'selesai')
+            ->where('created_at', '>=', $startDate)
+            ->count();
 
         return view('permohonan-konseling.index', compact(
             'permohonanKonseling',
             'kategoriKonseling',
-            'siswaWali'
+            'siswaWali',
+            'kriteria',
+            'jumlahRiwayat',
         ));
     }
 
@@ -64,73 +83,60 @@ class PermohonanKonselingController extends Controller
     {
         $request->validate([
             'deskripsi_permasalahan' => 'required|string',
-            'tingkat_urgensi_label' => 'required|string',
-            'tingkat_urgensi_skor' => 'required|integer',
-            'dampak_masalah_label' => 'required|string',
-            'dampak_masalah_skor' => 'required|integer',
-            'kategori_masalah_label' => 'required|string',
-            'kategori_masalah_skor' => 'required|integer',
-            'riwayat_konseling_label' => 'required|string',
-            'riwayat_konseling_skor' => 'required|integer',
-
             'siswa_id' => 'required_if:role,guru',
             'bukti_masalah' => 'nullable|file|mimes:jpg,jpeg,png,pdf,mp4,mov,avi,webm|max:10240',
+            'kriteria' => 'required|array',
+            'sub_kriteria' => 'required|array',
         ]);
 
         $user = Auth::user();
-
-        $reportType = $user->role === 'siswa' ? 'self' : 'teacher';
-
         $siswaId = $user->siswa->id ?? $request->siswa_id;
 
-        $skorAkhir =
-            ($request->tingkat_urgensi_skor * 0.4) +
-            ($request->dampak_masalah_skor * 0.3) +
-            ($request->kategori_masalah_skor * 0.2) +
-            ($request->riwayat_konseling_skor * 0.1);
-
-        $path = null;
-
-        if ($request->hasFile('bukti_masalah')) {
-            $path = $request->file('bukti_masalah')->store('bukti-masalah', 'public');
-        }
-
+        $path = $request->hasFile('bukti_masalah')
+            ? $request->file('bukti_masalah')->store('bukti-masalah', 'public')
+            : null;
         $permohonan = PermohonanKonseling::create([
             'siswa_id' => $siswaId,
             'tanggal_pengajuan' => now(),
             'deskripsi_permasalahan' => $request->deskripsi_permasalahan,
             'bukti_masalah' => $path,
             'status' => 'menunggu',
-
-            'report_type' => $reportType,
-
-            'tingkat_urgensi_label' => $request->tingkat_urgensi_label,
-            'tingkat_urgensi_skor' => $request->tingkat_urgensi_skor,
-
-            'dampak_masalah_label' => $request->dampak_masalah_label,
-            'dampak_masalah_skor' => $request->dampak_masalah_skor,
-
-            'kategori_masalah_label' => $request->kategori_masalah_label,
-            'kategori_masalah_skor' => $request->kategori_masalah_skor,
-
-            'riwayat_konseling_label' => $request->riwayat_konseling_label,
-            'riwayat_konseling_skor' => $request->riwayat_konseling_skor,
-
-            'skor_prioritas' => $skorAkhir,
+            'report_type' => $user->role === 'siswa' ? 'self' : 'teacher',
+            'skor_prioritas' => 0,
         ]);
 
-        $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
-        $pengaju = $user->name;
+        $totalSkor = 0;
 
+        foreach ($request->kriteria as $kriteriaId => $skor) {
+            $subNama = $request->sub_kriteria[$kriteriaId] ?? '';
+
+            $kriteria = Kriteria::find($kriteriaId);
+            $bobot = $kriteria->bobot / 100 ?? 1;
+
+            $totalSkor += $skor * $bobot;
+
+            PermohonanKriteria::create([
+                'permohonan_konseling_id' => $permohonan->id,
+                'kriteria_id' => $kriteriaId,
+                'kriteria_nama' => $kriteria->nama,
+                'sub_kriteria_nama' => $subNama,
+                'skor' => $skor,
+                'bobot' => $bobot,
+            ]);
+        }
+
+        $permohonan->update(['skor_prioritas' => $totalSkor]);
+        $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
         foreach ($guruBk as $guru) {
             $guru->notify(new PermohonanKonselingNotification(
                 $permohonan,
-                "$pengaju mengajukan permohonan konseling."
+                "$user->name mengajukan permohonan konseling."
             ));
         }
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil diajukan.');
     }
+
 
     public function updateJadwal(Request $request, $id)
     {
@@ -184,9 +190,29 @@ class PermohonanKonselingController extends Controller
             'nama_konselor' => Auth::user()->name,
         ]);
 
-        $user = $permohonan->siswa->user;
-        Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah disetujui.'));
+        if ($permohonan->report_type === 'teacher') {
+            $waliKelas = Guru::where('role_guru', 'walikelas')
+                ->where('kelas_id', $permohonan->siswa->kelas_id)
+                ->first();
 
+            if ($waliKelas && $waliKelas->user) {
+                Notification::send(
+                    $waliKelas->user,
+                    new PermohonanKonselingNotification(
+                        $permohonan,
+                        'Permohonan konseling yang Anda ajukan telah disetujui oleh guru BK.'
+                    )
+                );
+            }
+        } else {
+            Notification::send(
+                $permohonan->siswa->user,
+                new PermohonanKonselingNotification(
+                    $permohonan,
+                    'Permohonan konseling Anda telah disetujui.'
+                )
+            );
+        }
         return redirect()->back()->with('success', 'Permohonan konseling berhasil disetujui.');
     }
 
