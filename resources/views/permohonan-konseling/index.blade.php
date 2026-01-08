@@ -247,6 +247,25 @@
                                         </select>
                                         <input type="hidden" name="sub_kriteria[{{ $k->id }}]"
                                             id="label_{{ $k->id }}">
+
+                                        <div class="mt-2">
+                                            @foreach ($k->subKriteria as $sub)
+                                                <div class="card mb-2 border-start border-4 border-secondary shadow-sm">
+                                                    <div class="card-body py-2">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <strong>{{ $sub->nama_sub }}</strong>
+                                                            <span class="badge bg-secondary">{{ $sub->skor }}</span>
+                                                        </div>
+
+                                                        <div class="text-muted small mt-1">
+                                                            <i class="bi bi-lightbulb"></i>
+                                                            {{ $sub->guide_text }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+
                                     </div>
                                 @endif
                             @endforeach

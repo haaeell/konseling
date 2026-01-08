@@ -54,7 +54,8 @@ class KriteriaController extends Controller
         $request->validate([
             'kriteria_id' => 'required|exists:kriteria,id',
             'nama_sub'    => 'required',
-            'skor'        => 'required|integer'
+            'skor'        => 'required|integer',
+            'guide_text'  => 'required'
         ]);
 
         SubKriteria::create($request->all());
@@ -66,10 +67,11 @@ class KriteriaController extends Controller
     {
         $request->validate([
             'nama_sub' => 'required',
-            'skor'     => 'required|integer'
+            'skor'     => 'required|integer',
+            'guide_text' => 'required'
         ]);
 
-        SubKriteria::findOrFail($id)->update($request->only('nama_sub', 'skor'));
+        SubKriteria::findOrFail($id)->update($request->only('nama_sub', 'skor', 'guide_text'));
 
         return back()->with('success', 'Sub kriteria berhasil diupdate');
     }

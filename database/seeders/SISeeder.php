@@ -150,64 +150,65 @@ class SISeeder extends Seeder
 
         // ================== KRITERIA & SUB KRITERIA ==================
 
-        // 1. Tingkat Urgensi
-        $urgensiId = DB::table('kriteria')->insertGetId([
-            'nama' => 'Tingkat Urgensi',
-            'bobot' => 25,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $data = [
+            [
+                'nama'  => 'Tingkat Urgensi',
+                'bobot' => 25,
+                'subs'  => [
+                    ['nama' => 'Tidak Mendesak',   'skor' => 20, 'guide' => 'Masalah ringan dan tidak memerlukan penanganan segera'],
+                    ['nama' => 'Sedang Mendesak',  'skor' => 40, 'guide' => 'Perlu perhatian namun masih bisa ditunda'],
+                    ['nama' => 'Mendesak',         'skor' => 70, 'guide' => 'Perlu segera ditangani agar tidak memburuk'],
+                    ['nama' => 'Sangat Mendesak',  'skor' => 90, 'guide' => 'Harus segera ditangani karena berisiko tinggi'],
+                ],
+            ],
+            [
+                'nama'  => 'Dampak Masalah',
+                'bobot' => 25,
+                'subs'  => [
+                    ['nama' => 'Dampak Kecil',        'skor' => 20, 'guide' => 'Tidak mengganggu aktivitas utama siswa'],
+                    ['nama' => 'Dampak Sedang',       'skor' => 40, 'guide' => 'Mulai mempengaruhi kegiatan belajar'],
+                    ['nama' => 'Dampak Besar',        'skor' => 70, 'guide' => 'Mengganggu prestasi dan perilaku siswa'],
+                    ['nama' => 'Dampak Sangat Besar', 'skor' => 90, 'guide' => 'Mengganggu kehidupan akademik dan sosial'],
+                ],
+            ],
+            [
+                'nama'  => 'Kategori Masalah',
+                'bobot' => 25,
+                'subs'  => [
+                    ['nama' => 'Akademik', 'skor' => 20, 'guide' => 'Masalah terkait nilai atau pembelajaran'],
+                    ['nama' => 'Karir',    'skor' => 40, 'guide' => 'Masalah terkait perencanaan masa depan'],
+                    ['nama' => 'Pribadi',  'skor' => 70, 'guide' => 'Masalah pribadi atau emosional'],
+                    ['nama' => 'Sosial',   'skor' => 90, 'guide' => 'Masalah hubungan sosial atau lingkungan'],
+                ],
+            ],
+            [
+                'nama'  => 'Riwayat Konseling',
+                'bobot' => 25,
+                'subs'  => [
+                    ['nama' => 'Sudah Sering Konseling', 'skor' => 20, 'guide' => 'Lebih dari 3 kali dalam 1 bulan'],
+                    ['nama' => 'Sudah Beberapa Kali',    'skor' => 40, 'guide' => '1–3 kali dalam 1 bulan'],
+                    ['nama' => 'Jarang Pernah',          'skor' => 70, 'guide' => 'Pernah tapi tidak rutin'],
+                    ['nama' => 'Belum Pernah Konseling', 'skor' => 90, 'guide' => 'Belum pernah melakukan konseling'],
+                ],
+            ],
+        ];
 
-        DB::table('sub_kriterias')->insert([
-            ['kriteria_id' => $urgensiId, 'nama_sub' => 'Tidak Mendesak', 'skor' => 20, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $urgensiId, 'nama_sub' => 'Sedang Mendesak', 'skor' => 40, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $urgensiId, 'nama_sub' => 'Mendesak', 'skor' => 70, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $urgensiId, 'nama_sub' => 'Sangat Mendesak', 'skor' => 90, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // ================== INSERT DATA ==================
 
-        // 2. Dampak Masalah
-        $dampakId = DB::table('kriteria')->insertGetId([
-            'nama' => 'Dampak Masalah',
-            'bobot' => 25,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        foreach ($data as $kriteria) {
+            $kriteriaId = DB::table('kriteria')->insertGetId([
+                'nama'       => $kriteria['nama'],
+                'bobot'      => $kriteria['bobot'],
+            ]);
 
-        DB::table('sub_kriterias')->insert([
-            ['kriteria_id' => $dampakId, 'nama_sub' => 'Dampak Kecil', 'skor' => 20, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $dampakId, 'nama_sub' => 'Dampak Sedang', 'skor' => 40, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $dampakId, 'nama_sub' => 'Dampak Besar', 'skor' => 70, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $dampakId, 'nama_sub' => 'Dampak Sangat Besar', 'skor' => 90, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // 3. Kategori Masalah
-        $kategoriId = DB::table('kriteria')->insertGetId([
-            'nama' => 'Kategori Masalah',
-            'bobot' => 25,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('sub_kriterias')->insert([
-            ['kriteria_id' => $kategoriId, 'nama_sub' => 'Akademik', 'skor' => 20, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $kategoriId, 'nama_sub' => 'Karir', 'skor' => 40, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $kategoriId, 'nama_sub' => 'Pribadi', 'skor' => 70, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $kategoriId, 'nama_sub' => 'Sosial', 'skor' => 90, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // 4. Riwayat Konseling
-        $riwayatId = DB::table('kriteria')->insertGetId([
-            'nama' => 'Riwayat Konseling',
-            'bobot' => 25,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('sub_kriterias')->insert([
-            ['kriteria_id' => $riwayatId, 'nama_sub' => 'Sudah Sering Konseling', 'skor' => 20, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $riwayatId, 'nama_sub' => 'Sudah Beberapa Kali', 'skor' => 40, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $riwayatId, 'nama_sub' => 'Jarang Pernah', 'skor' => 70, 'created_at' => now(), 'updated_at' => now()],
-            ['kriteria_id' => $riwayatId, 'nama_sub' => 'Belum Pernah Konseling', 'skor' => 90, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+            foreach ($kriteria['subs'] as $sub) {
+                DB::table('sub_kriterias')->insert([
+                    'kriteria_id' => $kriteriaId,
+                    'nama_sub'    => $sub['nama'],
+                    'guide_text'  => $sub['guide'],
+                    'skor'        => $sub['skor'],
+                ]);
+            }
+        }
     }
 }

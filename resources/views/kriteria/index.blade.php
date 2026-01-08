@@ -41,6 +41,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th><i class="bi bi-journal-text me-1"></i>Sub Kriteria</th>
+                                        <th><i class="bi bi-question-circle me-1"></i>Guide</th>
                                         <th><i class="bi bi-star me-1"></i>Skor</th>
                                         <th width="120"><i class="bi bi-gear me-1"></i>Aksi</th>
                                     </tr>
@@ -49,6 +50,11 @@
                                     @foreach ($k->subKriteria as $sub)
                                         <tr>
                                             <td>{{ $sub->nama_sub }}</td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    {{ $sub->guide_text ?? '-' }}
+                                                </small>
+                                            </td>
                                             <td>{{ $sub->skor }}</td>
                                             <td>
                                                 <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
@@ -91,6 +97,15 @@
                                     <input type="text" name="nama_sub" class="form-control" required>
                                 </div>
                                 <div class="mb-3">
+                                    <label class="form-label">
+                                        Guide Text
+                                        <small class="text-muted">(petunjuk penilaian)</small>
+                                    </label>
+                                    <textarea name="guide_text" class="form-control" rows="2"
+                                        placeholder="Contoh: Pilih ini jika siswa sering melakukan pelanggaran ringan"></textarea>
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label">Skor</label>
                                     <input type="number" name="skor" class="form-control" required>
                                 </div>
@@ -113,8 +128,8 @@
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label class="form-label">Nama Kriteria</label>
-                                    <input type="text" name="nama" class="form-control" value="{{ $k->nama }}"
-                                        required>
+                                    <input type="text" name="nama" class="form-control"
+                                        value="{{ $k->nama }}" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Bobot</label>
@@ -145,6 +160,11 @@
                                         <input type="text" name="nama_sub" class="form-control"
                                             value="{{ $sub->nama_sub }}" required>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Guide Text</label>
+                                        <textarea name="guide_text" class="form-control" rows="2">{{ $sub->guide_text }}</textarea>
+                                    </div>
+
                                     <div class="mb-3">
                                         <label class="form-label">Skor</label>
                                         <input type="number" name="skor" class="form-control"
