@@ -75,6 +75,36 @@
             </div>
         </div>
 
+        <!-- Notifikasi & Jadwal Tugas Siswa -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-lg h-100">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-bell"></i> Notifikasi
+                    </div>
+                    <div class="card-body">
+                        {{-- Contoh notifikasi, ganti dengan @foreach jika dinamis --}}
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Belum ada notifikasi baru.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-lg h-100">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-calendar-event"></i> Jadwal Tugas
+                    </div>
+                    <div class="card-body">
+                        {{-- Contoh jadwal tugas, ganti dengan @foreach jika dinamis --}}
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Tidak ada tugas yang akan datang.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bar Chart -->
         <!-- <div class="row mt-4">
                 <div class="col-12">
