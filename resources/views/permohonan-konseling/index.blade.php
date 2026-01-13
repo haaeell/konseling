@@ -237,25 +237,18 @@
                                 @else
                                     <div class="mb-3">
                                         <label class="form-label">{{ $k->nama }}</label>
-                                        <select class="form-control" name="kriteria[{{ $k->id }}]" required
-                                            onchange="document.getElementById('label_{{ $k->id }}').value=this.options[this.selectedIndex].text">
-                                            <option value="">Pilih {{ $k->nama }}</option>
-                                            @foreach ($k->subKriteria as $sub)
-                                                <option value="{{ $sub->skor }}">{{ $sub->nama_sub }}</option>
-                                            @endforeach
-                                        </select>
-                                        <input type="hidden" name="sub_kriteria[{{ $k->id }}]"
-                                            id="label_{{ $k->id }}">
-
+                                        <input type="hidden" name="kriteria[{{ $k->id }}]" id="kriteria_{{ $k->id }}" required>
+                                        <input type="hidden" name="sub_kriteria[{{ $k->id }}]" id="label_{{ $k->id }}">
                                         <div class="mt-2">
-                                            @foreach ($k->subKriteria as $sub)
-                                                <div class="card mb-2 border-start border-4 border-secondary shadow-sm">
+                                            @foreach ($k->subKriteria->sortByDesc('skor') as $sub)
+                                                <div class="card mb-2 border-start border-4 border-secondary shadow-sm subkriteria-card" style="cursor:pointer; transition:0.2s;" data-kriteria="{{ $k->id }}" data-skor="{{ $sub->skor }}" data-nama="{{ $sub->nama_sub }}">
                                                     <div class="card-body py-2">
                                                         <div class="d-flex justify-content-between align-items-center">
-                                                            <strong>{{ $sub->nama_sub }}</strong>
+                                                            <div class="d-flex align-items-center" style="gap: 0.5rem;">
+                                                                <strong class="mb-0">{{ $sub->nama_sub }}</strong>
+                                                            </div>
                                                             <span class="badge bg-secondary">{{ $sub->skor }}</span>
                                                         </div>
-
                                                         <div class="text-muted small mt-1">
                                                             <i class="bi bi-lightbulb"></i>
                                                             {{ $sub->guide_text }}
@@ -264,7 +257,7 @@
                                                 </div>
                                             @endforeach
                                         </div>
-
+                                        <div class="text-danger small mt-1" id="error_kriteria_{{ $k->id }}" style="display:none;">Pilih salah satu sub kriteria.</div>
                                     </div>
                                 @endif
                             @endforeach
@@ -291,6 +284,7 @@
                             </div>
                         </div>
 
+                        <div id="ringkasan-pilihan" class="alert alert-info mb-2" style="display:none;"></div>
                         <div class="modal-footer">
                             <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                             <button class="btn btn-primary"><i class="bi bi-send"></i> Kirim Permohonan</button>
@@ -412,14 +406,11 @@
         $(document).ready(function() {
             function loadRiwayat(siswaId) {
                 $.get('/ajax/riwayat-konseling/' + siswaId, function(res) {
-
                     $('#riwayat_konseling_display').html(
                         `<option>${res.nama} [${res.range}] (Skor: ${res.skor})</option>`
                     );
-
                     $('#jumlah_riwayat').text(res.jumlah);
                     $('#riwayat_info').show();
-
                     $('#riwayat_skor').val(res.skor);
                     $('#riwayat_nama').val(res.nama);
                 });
@@ -437,6 +428,58 @@
                     if (siswaId) loadRiwayat(siswaId);
                 });
             @endif
+
+
+            // Interaktif sub kriteria dengan highlight, ceklis, dan ringkasan
+            function updateRingkasanPilihan() {
+                var ringkasan = [];
+                @foreach ($kriteria as $k)
+                    @if ($k->nama !== 'Riwayat Konseling')
+                        var nama = $('#label_{{ $k->id }}').val();
+                        if (nama) ringkasan.push('<span class="badge bg-primary">{{ $k->nama }}: ' + nama + '</span>');
+                    @endif
+                @endforeach
+            }
+
+            $('.subkriteria-card').on('click', function() {
+                var kriteriaId = $(this).data('kriteria');
+                var skor = $(this).data('skor');
+                var nama = $(this).data('nama');
+
+                // Set value ke input hidden
+                $('#kriteria_' + kriteriaId).val(skor);
+                $('#label_' + kriteriaId).val(nama);
+
+                // Highlight card terpilih dan ceklis
+                var group = $(this).closest('.mt-2').find('.subkriteria-card');
+                group.removeClass('border-primary bg-light').addClass('border-secondary');
+                group.find('.ceklis-icon').hide();
+                $(this).removeClass('border-secondary').addClass('border-primary bg-light');
+                $(this).find('.ceklis-icon').show();
+
+                // Hilangkan error jika ada
+                $('#error_kriteria_' + kriteriaId).hide();
+
+                // Update ringkasan
+                updateRingkasanPilihan();
+            });
+
+            // Update ringkasan saat load (jika ada value lama)
+            updateRingkasanPilihan();
+
+            // Validasi sebelum submit
+            $('form[action*="permohonan-konseling.store"]').on('submit', function(e) {
+                var valid = true;
+                @foreach ($kriteria as $k)
+                    @if ($k->nama !== 'Riwayat Konseling')
+                        if (!$('#kriteria_{{ $k->id }}').val()) {
+                            $('#error_kriteria_{{ $k->id }}').show();
+                            valid = false;
+                        }
+                    @endif
+                @endforeach
+                if (!valid) e.preventDefault();
+            });
 
             $('.approve-permohonan').on('click', function() {
                 $('#approveForm').attr('action', "{{ url('permohonan-konseling/approve') }}/" + $(this)
