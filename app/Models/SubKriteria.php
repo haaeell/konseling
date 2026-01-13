@@ -7,7 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class SubKriteria extends Model
 {
     protected $table = 'sub_kriterias';
-    protected $fillable = ['kriteria_id', 'nama_sub', 'skor',    'guide_text'];
+    protected $fillable = [
+        'kriteria_id',
+        'nama_sub',
+        'skor',
+        'range_min',
+        'range_max',
+        'guide_text'
+    ];
+
 
     public function kriteria()
     {

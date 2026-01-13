@@ -13,6 +13,9 @@
 
         <div class="accordion" id="accordionKriteria">
             @foreach ($kriteria as $k)
+                @php
+                    $isRiwayat = strtolower($k->nama) === 'riwayat konseling';
+                @endphp
                 <div class="accordion-item mb-2 shadow-sm">
                     <h2 class="accordion-header" id="heading{{ $k->id }}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -42,6 +45,9 @@
                                     <tr>
                                         <th><i class="bi bi-journal-text me-1"></i>Sub Kriteria</th>
                                         <th><i class="bi bi-question-circle me-1"></i>Guide</th>
+                                        @if ($isRiwayat)
+                                            <th>Range</th>
+                                        @endif
                                         <th><i class="bi bi-star me-1"></i>Skor</th>
                                         <th width="120"><i class="bi bi-gear me-1"></i>Aksi</th>
                                     </tr>
@@ -55,6 +61,13 @@
                                                     {{ $sub->guide_text ?? '-' }}
                                                 </small>
                                             </td>
+                                            @if ($isRiwayat)
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        {{ $sub->range_min }} - {{ $sub->range_max }}
+                                                    </span>
+                                                </td>
+                                            @endif
                                             <td>{{ $sub->skor }}</td>
                                             <td>
                                                 <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
@@ -96,6 +109,19 @@
                                     <label class="form-label">Nama Sub Kriteria</label>
                                     <input type="text" name="nama_sub" class="form-control" required>
                                 </div>
+                                @if ($isRiwayat)
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Range Minimum</label>
+                                            <input type="number" name="range_min" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Range Maksimum</label>
+                                            <input type="number" name="range_max" class="form-control" required>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div class="mb-3">
                                     <label class="form-label">
                                         Guide Text
@@ -160,6 +186,21 @@
                                         <input type="text" name="nama_sub" class="form-control"
                                             value="{{ $sub->nama_sub }}" required>
                                     </div>
+                                    @if (strtolower($k->nama) === 'riwayat konseling')
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Range Minimum</label>
+                                                <input type="number" name="range_min" class="form-control"
+                                                    value="{{ $sub->range_min }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Range Maksimum</label>
+                                                <input type="number" name="range_max" class="form-control"
+                                                    value="{{ $sub->range_max }}">
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     <div class="mb-3">
                                         <label class="form-label">Guide Text</label>
                                         <textarea name="guide_text" class="form-control" rows="2">{{ $sub->guide_text }}</textarea>

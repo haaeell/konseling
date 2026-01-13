@@ -183,19 +183,6 @@
                                     </div>
                                 </div>
                             @endif
-                            @php
-
-                                if ($jumlahRiwayat > 3) {
-                                    $riwayatNama = 'Sudah Sering Konseling';
-                                    $riwayatSkor = 20;
-                                } elseif ($jumlahRiwayat >= 1) {
-                                    $riwayatNama = 'Sudah Beberapa Kali';
-                                    $riwayatSkor = 40;
-                                } else {
-                                    $riwayatNama = 'Belum Pernah Konseling';
-                                    $riwayatSkor = 90;
-                                }
-                            @endphp
 
                             @foreach ($kriteria as $k)
                                 @if ($k->nama === 'Riwayat Konseling')
@@ -214,20 +201,32 @@
 
                                                 <div>
                                                     Nilai ditentukan otomatis berdasarkan aturan berikut:
-                                                    <ul class="mb-0 ps-3">
+                                                    @php
+                                                    $riwayatSubs = collect();
+                                                
+                                                    foreach ($kriteria as $kr) {
+                                                        if ($kr->nama === 'Riwayat Konseling') {
+                                                            $riwayatSubs = $kr->subKriteria->sortBy('range_min');
+                                                            break;
+                                                        }
+                                                    }
+                                                @endphp
+                                                <ul class="mb-0 ps-3">
+                                                    @foreach ($riwayatSubs as $sub)
                                                         <li>
-                                                            <strong>0 kali</strong> →
-                                                            Belum Pernah Konseling
+                                                            <strong>
+                                                                @if ($sub->range_min === $sub->range_max)
+                                                                    {{ $sub->range_min }} kali
+                                                                @else
+                                                                    {{ $sub->range_min }} – {{ $sub->range_max }} kali
+                                                                @endif
+                                                            </strong>
+                                                            →
+                                                            {{ $sub->nama_sub }}
                                                         </li>
-                                                        <li>
-                                                            <strong>1–3 kali</strong> →
-                                                            Sudah Beberapa Kali
-                                                        </li>
-                                                        <li>
-                                                            <strong>> 3 kali</strong> →
-                                                            Sudah Sering Konseling
-                                                        </li>
-                                                    </ul>
+                                                    @endforeach
+                                                </ul>
+                                                
                                                 </div>
                                             </div>
                                         </div>
@@ -415,7 +414,7 @@
                 $.get('/ajax/riwayat-konseling/' + siswaId, function(res) {
 
                     $('#riwayat_konseling_display').html(
-                        `<option>${res.nama} (${res.skor})</option>`
+                        `<option>${res.nama} [${res.range}] (Skor: ${res.skor})</option>`
                     );
 
                     $('#jumlah_riwayat').text(res.jumlah);

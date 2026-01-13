@@ -224,23 +224,29 @@ class PermohonanKonselingController extends Controller
             ->where('status', 'selesai')
             ->count();
 
-        if ($jumlahRiwayat > 3) {
-            $riwayatNama = 'Sudah Sering Konseling';
-            $riwayatSkor = 20;
-        } elseif ($jumlahRiwayat >= 1) {
-            $riwayatNama = 'Sudah Beberapa Kali';
-            $riwayatSkor = 40;
-        } else {
-            $riwayatNama = 'Belum Pernah Konseling';
-            $riwayatSkor = 90;
+        $sub = SubKriteria::whereHas('kriteria', function ($q) {
+            $q->where('nama', 'Riwayat Konseling');
+        })
+            ->where('range_min', '<=', $jumlahRiwayat)
+            ->where('range_max', '>=', $jumlahRiwayat)
+            ->first();
+
+        if (!$sub) {
+            return response()->json([
+                'jumlah' => $jumlahRiwayat,
+                'nama'   => 'Tidak Terdefinisi',
+                'skor'   => 0
+            ]);
         }
 
         return response()->json([
             'jumlah' => $jumlahRiwayat,
-            'nama' => $riwayatNama,
-            'skor' => $riwayatSkor
+            'nama'   => $sub->nama_sub,
+            'skor'   => $sub->skor,
+            'range'  => $sub->range_min . ' - ' . $sub->range_max
         ]);
     }
+
 
     public function reject(Request $request, $id)
     {

@@ -55,10 +55,19 @@ class KriteriaController extends Controller
             'kriteria_id' => 'required|exists:kriteria,id',
             'nama_sub'    => 'required',
             'skor'        => 'required|integer',
-            'guide_text'  => 'required'
+            'guide_text'  => 'required',
+            'range_min'   => 'required|integer',
+            'range_max'   => 'required|integer|gte:range_min',
         ]);
 
-        SubKriteria::create($request->all());
+        $data = $request->all();
+
+        if (!isset($data['range_min'])) {
+            $data['range_min'] = null;
+            $data['range_max'] = null;
+        }
+
+        SubKriteria::create($data);
 
         return back()->with('success', 'Sub kriteria berhasil ditambahkan');
     }
@@ -68,10 +77,14 @@ class KriteriaController extends Controller
         $request->validate([
             'nama_sub' => 'required',
             'skor'     => 'required|integer',
+            'range_min' => 'required|integer',
+            'range_max' => 'required|integer|gte:range_min',
             'guide_text' => 'required'
         ]);
 
-        SubKriteria::findOrFail($id)->update($request->only('nama_sub', 'skor', 'guide_text'));
+        $data = $request->only('nama_sub', 'skor', 'guide_text', 'range_min', 'range_max');
+
+        SubKriteria::findOrFail($id)->update($data);
 
         return back()->with('success', 'Sub kriteria berhasil diupdate');
     }
