@@ -76,7 +76,7 @@
         </div>
 
         <!-- Notifikasi & Jadwal Tugas Siswa -->
-        <div class="row mt-4">
+        <!--<div class="row mt-4">
             <div class="col-md-6 mb-3">
                 <div class="card shadow-lg h-100">
                     <div class="card-header bg-primary text-white">
@@ -103,7 +103,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
 
         <!-- Bar Chart -->
         <!-- <div class="row mt-4">

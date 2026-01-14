@@ -212,19 +212,21 @@
                                                     }
                                                 @endphp
                                                 <ul class="mb-0 ps-3">
-                                                    @foreach ($riwayatSubs as $sub)
-                                                        <li>
-                                                            <strong>
-                                                                @if ($sub->range_min === $sub->range_max)
-                                                                    {{ $sub->range_min }} kali
-                                                                @else
-                                                                    {{ $sub->range_min }} – {{ $sub->range_max }} kali
-                                                                @endif
-                                                            </strong>
-                                                            →
-                                                            {{ $sub->nama_sub }}
-                                                        </li>
-                                                    @endforeach
+                                                @foreach ($riwayatSubs as $sub)
+                                                    <li>
+                                                        <strong>
+                                                            @if ($sub->range_min === $sub->range_max)
+                                                                {{ $sub->range_min }} kali
+                                                            @elseif ($loop->last)
+                                                                {{ $sub->range_min }} &lt; ... kali
+                                                            @else
+                                                                {{ $sub->range_min }} – {{ $sub->range_max }} kali
+                                                            @endif
+                                                        </strong>
+                                                        →
+                                                        {{ $sub->nama_sub }}
+                                                    </li>
+                                                @endforeach
                                                 </ul>
                                                 
                                                 </div>
