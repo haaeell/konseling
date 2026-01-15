@@ -12,44 +12,54 @@
                     <i class="bi bi-journal-text text-primary"></i> Laporan Konseling Siswa
                 </h4>
 
-                <form action="{{ route('laporan.index') }}" method="GET" class="row g-3">
+                @if (!Auth::user()->isOrangTua())
+                    <form action="{{ route('laporan.index') }}" method="GET" class="row g-3">
 
-                    <div class="col-md-3">
-                        <label class="form-label">Tahun Akademik</label>
-                        <select name="tahun_akademik" class="form-select" required>
-                            @foreach ($tahunAjaranList as $th)
-                                <option value="{{ $th->id }}"
-                                    {{ $request->tahun_akademik == $th->id ? 'selected' : '' }}>
-                                    {{ $th->tahun }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tahun Akademik</label>
+                            <select name="tahun_akademik" class="form-select" required>
+                                @foreach ($tahunAjaranList as $th)
+                                    <option value="{{ $th->id }}"
+                                        {{ $request->tahun_akademik == $th->id ? 'selected' : '' }}>
+                                        {{ $th->tahun }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">Kelas Siswa</label>
-                        <select name="kelas" class="form-select">
-                            <option value="">Semua Kelas</option>
-                            @foreach ($kelasList as $k)
-                                <option value="{{ $k->id }}" {{ $request->kelas == $k->id ? 'selected' : '' }}>
-                                    {{ $k->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Kelas Siswa</label>
+                            <select name="kelas" class="form-select">
+                                <option value="">Semua Kelas</option>
+                                @foreach ($kelasList as $k)
+                                    <option value="{{ $k->id }}" {{ $request->kelas == $k->id ? 'selected' : '' }}>
+                                        {{ $k->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-primary w-100">
-                            <i class="bi bi-search"></i> Pilih
-                        </button>
-                    </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Pilih
+                            </button>
+                        </div>
 
-                    <div class="col-md-2 d-flex align-items-end">
-                        <a href="{{ route('laporan.pdf', request()->all()) }}" class="btn btn-danger w-100" target="_blank">
-                            <i class="bi bi-file-earmark-pdf"></i> Cetak
-                        </a>
-                    </div>
-                </form>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <a href="{{ route('laporan.pdf', request()->all()) }}" class="btn btn-danger w-100" target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i> Cetak
+                            </a>
+                        </div>
+                    </form>
+                @else
+                    <form action="{{ route('laporan.index') }}" method="GET" class="row g-3">
+                        <div class="col-md-2 d-flex align-items-end">
+                            <a href="{{ route('laporan.pdf', request()->all()) }}" class="btn btn-danger w-100" target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i> Cetak
+                            </a>
+                        </div>
+                    </form>
+                @endif
             </div>
 
             <div class="card-body">

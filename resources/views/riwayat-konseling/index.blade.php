@@ -72,7 +72,7 @@
         $(document).ready(function() {
             $('#datatableRiwayat').DataTable({
                 order: [
-                    [5, 'desc']
+                    [2, 'desc']
                 ],
                 columnDefs: [{
                     orderable: false,
