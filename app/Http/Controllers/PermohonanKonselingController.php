@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use App\Models\PermohonanKonseling;
-use App\Models\KategoriKonseling;
 use App\Models\Kriteria;
 use App\Models\PermohonanKriteria;
 use App\Models\Siswa;
@@ -54,7 +53,6 @@ class PermohonanKonselingController extends Controller
         }
 
         $permohonanKonseling = $query->get();
-        $kategoriKonseling = KategoriKonseling::all();
         $kriteria = Kriteria::all();
 
 
@@ -71,7 +69,6 @@ class PermohonanKonselingController extends Controller
 
         return view('permohonan-konseling.index', compact(
             'permohonanKonseling',
-            'kategoriKonseling',
             'siswaWali',
             'kriteria',
             'jumlahRiwayat',
@@ -106,6 +103,7 @@ class PermohonanKonselingController extends Controller
         ]);
 
         $totalSkor = 0;
+        $kriteriaLabels = [];
 
         foreach ($request->kriteria as $kriteriaId => $skor) {
             $subNama = $request->sub_kriteria[$kriteriaId] ?? '';
@@ -114,6 +112,21 @@ class PermohonanKonselingController extends Controller
             $bobot = $kriteria->bobot / 100 ?? 1;
 
             $totalSkor += $skor * $bobot;
+
+            // Simpan label kriteria berdasarkan nama kriteria
+            if ($kriteria->nama === 'Tingkat Urgensi') {
+                $kriteriaLabels['tingkat_urgensi_label'] = $subNama;
+                $kriteriaLabels['tingkat_urgensi_skor'] = $skor;
+            } elseif ($kriteria->nama === 'Dampak Masalah') {
+                $kriteriaLabels['dampak_masalah_label'] = $subNama;
+                $kriteriaLabels['dampak_masalah_skor'] = $skor;
+            } elseif ($kriteria->nama === 'Kategori Masalah') {
+                $kriteriaLabels['kategori_masalah_label'] = $subNama;
+                $kriteriaLabels['kategori_masalah_skor'] = $skor;
+            } elseif ($kriteria->nama === 'Riwayat Konseling') {
+                $kriteriaLabels['riwayat_konseling_label'] = $subNama;
+                $kriteriaLabels['riwayat_konseling_skor'] = $skor;
+            }
 
             PermohonanKriteria::create([
                 'permohonan_konseling_id' => $permohonan->id,
@@ -125,7 +138,7 @@ class PermohonanKonselingController extends Controller
             ]);
         }
 
-        $permohonan->update(['skor_prioritas' => $totalSkor]);
+        $permohonan->update(array_merge(['skor_prioritas' => $totalSkor], $kriteriaLabels));
         $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
         foreach ($guruBk as $guru) {
             $guru->notify(new PermohonanKonselingNotification(

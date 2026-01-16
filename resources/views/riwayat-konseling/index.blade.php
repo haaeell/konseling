@@ -14,8 +14,8 @@
                                 <th>Tipe</th>
                                 <th>Tanggal Konseling</th>
                                 <th>Deskripsi Permasalahan</th>
-                                <th>Status</th>
                                 <th>Rangkuman</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="riwayatKonselingTable">
@@ -36,6 +36,7 @@
 
                                     <td>{{ $jadwal->tanggal_disetujui ? \Carbon\Carbon::parse($jadwal->tanggal_disetujui)->format('d-m-Y') : '-' }}</td>
                                     <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
+                                    <td>{{ Str::limit($jadwal->rangkuman, 50) }}</td>
                                     <td>
                                         <span
                                             class="badge
@@ -55,7 +56,6 @@
                                             </div>
                                         @endif
                                     </td>
-                                    <td>{{ Str::limit($jadwal->rangkuman, 50) }}</td>
 
                                 </tr>
                             @endforeach

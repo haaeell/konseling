@@ -15,7 +15,7 @@
                 @if (!Auth::user()->isOrangTua())
                     <form action="{{ route('laporan.index') }}" method="GET" class="row g-3">
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Tahun Akademik</label>
                             <select name="tahun_akademik" class="form-select" required>
                                 @foreach ($tahunAjaranList as $th)
@@ -27,8 +27,8 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Kelas Siswa</label>
+                        <div class="col-md-2">
+                            <label class="form-label">Kelas</label>
                             <select name="kelas" class="form-select">
                                 <option value="">Semua Kelas</option>
                                 @foreach ($kelasList as $k)
@@ -40,8 +40,8 @@
                         </div>
 
                         <div class="col-md-2 d-flex align-items-end">
-                            <button class="btn btn-primary w-100">
-                                <i class="bi bi-search"></i> Pilih
+                            <button type="submit" class="btn btn-primary w-100" target="_blank">
+                                <i class="bi bi-search"></i> Cari
                             </button>
                         </div>
 
@@ -71,13 +71,13 @@
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
-                                <th>Tanggal</th>
+                                <th>Tanggal Konseling</th>
                                 <th>Nama Siswa</th>
                                 <th>Kelas</th>
-                                <th>Kategori Konseling</th>
                                 <th>Masalah</th>
+                                <th>Tempat</th>
                                 <th>Penyelesaian</th>
-                                <th>Nama Konselor</th>
+                                <th>Konselor</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -86,15 +86,27 @@
                             @foreach ($laporan as $index => $row)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($row->tanggal_disetujui)->format('d-m-Y') }}</td>
+                                    <td>{{ $row->tanggal_disetujui ? \Carbon\Carbon::parse($row->tanggal_disetujui)->format('d-m-Y') : '-' }}</td>
                                     <td>{{ $row->siswa->user->name }}</td>
                                     <td>{{ $row->siswa->kelas->nama }}</td>
-                                    <td>{{ $row->kategori_masalah_label }}</td>
-                                    <td>{{ Str::limit($row->deskripsi_permasalahan, 50) }}</td>
-                                    <td>{{ Str::limit($row->rangkuman ?? '-', 50) }}</td>
-                                    <td>{{ $row->nama_konselor }}</td>
                                     <td>
-                                        <span class="badge bg-success">{{ ucfirst($row->status) }}</span>
+                                        <small>{{ Str::limit($row->deskripsi_permasalahan, 40) }}</small>
+                                        <br>
+                                        @if ($row->kategori_masalah_label)
+                                            <span class="badge bg-primary">
+                                                {{ $row->kategori_masalah_label }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted small">-</span>
+                                        @endif
+                                    </td>
+                                    <td><small>{{ $row->tempat ?? '-' }}</small></td>
+                                    <td><small>{{ Str::limit($row->rangkuman ?? '-', 40) }}</small></td>
+                                    <td>{{ $row->nama_konselor ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge {{ $row->status === 'selesai' ? 'bg-success' : ($row->status === 'ditolak' ? 'bg-danger' : ($row->status === 'disetujui' ? 'bg-info' : 'bg-warning')) }}">
+                                            {{ ucfirst($row->status) }}
+                                        </span>
                                     </td>
                                 </tr>
                             @endforeach

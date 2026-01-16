@@ -20,7 +20,7 @@
             {{-- DATA --}}
             <li
                 class="sidebar-item has-sub 
-                {{ request()->is('tahun-akademik', 'kelas', 'guru', 'siswa', 'kategori-konseling') ? 'active' : '' }}">
+                {{ request()->is('tahun-akademik', 'kelas', 'guru', 'siswa') ? 'active' : '' }}">
                 <a href="#" class="sidebar-link d-flex align-items-center gap-2">
                     <i class="bi bi-folder-fill"></i>
                     <span>Data</span>

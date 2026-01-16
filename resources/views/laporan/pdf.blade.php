@@ -57,6 +57,11 @@
             </tr>
 
             <tr>
+                <td><strong>Status</strong></td>
+                <td>{{ ucfirst($request->status ?? 'selesai') }}</td>
+            </tr>
+
+            <tr>
                 <td><strong>Kelas</strong></td>
                 <td>
                     @if ($request->kelas)
@@ -66,6 +71,22 @@
                     @endif
                 </td>
             </tr>
+
+            @if ($request->tanggal_dari || $request->tanggal_sampai)
+                <tr>
+                    <td><strong>Periode Tanggal</strong></td>
+                    <td>
+                        {{ $request->tanggal_dari ? \Carbon\Carbon::parse($request->tanggal_dari)->format('d-m-Y') : '-' }}
+                        s/d
+                        {{ $request->tanggal_sampai ? \Carbon\Carbon::parse($request->tanggal_sampai)->format('d-m-Y') : '-' }}
+                    </td>
+                </tr>
+            @endif
+
+            <tr>
+                <td><strong>Total Data</strong></td>
+                <td>{{ count($laporan) }} data</td>
+            </tr>
         </tbody>
     </table>
 
@@ -73,11 +94,11 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Tanggal</th>
+                <th>Tanggal Konseling</th>
                 <th>Nama Siswa</th>
                 <th>Kelas</th>
-                <th>Kategori</th>
                 <th>Masalah</th>
+                <th>Tempat</th>
                 <th>Penyelesaian</th>
                 <th>Konselor</th>
                 <th>Status</th>
@@ -88,13 +109,13 @@
             @foreach ($laporan as $i => $row)
                 <tr>
                     <td class="center">{{ $i + 1 }}</td>
-                    <td>{{ \Carbon\Carbon::parse($row->tanggal_pengajuan)->format('d-m-Y') }}</td>
+                    <td>{{ $row->tanggal_disetujui ? \Carbon\Carbon::parse($row->tanggal_disetujui)->format('d-m-Y') : '-' }}</td>
                     <td>{{ $row->siswa->user->name }}</td>
                     <td>{{ $row->siswa->kelas->nama }}</td>
-                    <td>{{ $row->kategori_masalah_label }}</td>
-                    <td>{{ $row->deskripsi_permasalahan }}</td>
-                    <td>{{ $row->rangkuman ?? '-' }}</td>
-                    <td>{{ $row->nama_konselor }}</td>
+                    <td>{{ substr($row->deskripsi_permasalahan, 0, 50) }} ({{ $row->kategori_masalah_label ?? '-' }})</td>
+                    <td>{{ $row->tempat ?? '-' }}</td>
+                    <td>{{ substr($row->rangkuman ?? '-', 0, 50) }}</td>
+                    <td>{{ $row->nama_konselor ?? '-' }}</td>
                     <td class="center">{{ ucfirst($row->status) }}</td>
                 </tr>
             @endforeach

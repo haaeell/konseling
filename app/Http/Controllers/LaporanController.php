@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\PermohonanKonseling;
 use App\Models\TahunAkademik;
 use App\Models\Kelas;
+use App\Models\Guru;
 use Illuminate\Support\Facades\Auth;
 
 class LaporanController extends Controller
@@ -14,12 +15,13 @@ class LaporanController extends Controller
     {
         $tahunAjaranList = TahunAkademik::orderBy('tahun', 'desc')->get();
         $kelasList = Kelas::with('tahunAkademik')->orderBy('nama')->get();
+        $guruList = Guru::where('role_guru', 'bk')->with('user')->get();
 
         $query = PermohonanKonseling::with([
             'siswa.user',
             'siswa.kelas',
             'guruBk.user'
-        ])->where('status', 'selesai');
+        ]);
 
         // Jika user adalah orangtua, hanya tampilkan laporan anak mereka
         if (Auth::user()->isOrangTua()) {
@@ -27,6 +29,12 @@ class LaporanController extends Controller
             if ($orangtua && $orangtua->siswa_id) {
                 $query->where('siswa_id', $orangtua->siswa_id);
             }
+        }
+
+        // Filter Status (default selesai jika tidak dipilih)
+        $status = $request->status ?? 'selesai';
+        if ($status) {
+            $query->where('status', $status);
         }
 
         if ($request->tahun_akademik) {
@@ -41,12 +49,28 @@ class LaporanController extends Controller
             });
         }
 
-        $laporan = $query->get();
+        // Filter Konselor
+        if ($request->konselor) {
+            $query->where('nama_konselor', 'like', '%' . $request->konselor . '%');
+        }
+
+        // Filter Tanggal (dari)
+        if ($request->tanggal_dari) {
+            $query->where('tanggal_disetujui', '>=', $request->tanggal_dari);
+        }
+
+        // Filter Tanggal (sampai)
+        if ($request->tanggal_sampai) {
+            $query->where('tanggal_disetujui', '<=', $request->tanggal_sampai);
+        }
+
+        $laporan = $query->orderBy('tanggal_disetujui', 'desc')->get();
 
         return view('laporan.index', [
             'laporan' => $laporan,
             'tahunAjaranList' => $tahunAjaranList,
             'kelasList' => $kelasList,
+            'guruList' => $guruList,
             'request' => $request
         ]);
     }
@@ -58,7 +82,7 @@ class LaporanController extends Controller
         $query = PermohonanKonseling::with([
             'siswa.user',
             'siswa.kelas'
-        ])->where('status', 'selesai');
+        ]);
 
         // Jika user adalah orangtua, hanya tampilkan laporan anak mereka
         if (Auth::user()->isOrangTua()) {
@@ -66,6 +90,12 @@ class LaporanController extends Controller
             if ($orangtua && $orangtua->siswa_id) {
                 $query->where('siswa_id', $orangtua->siswa_id);
             }
+        }
+
+        // Filter Status (default selesai)
+        $status = $request->status ?? 'selesai';
+        if ($status) {
+            $query->where('status', $status);
         }
 
         if ($request->tahun_akademik) {
@@ -80,7 +110,22 @@ class LaporanController extends Controller
             });
         }
 
-        $laporan = $query->get();
+        // Filter Konselor
+        if ($request->konselor) {
+            $query->where('nama_konselor', 'like', '%' . $request->konselor . '%');
+        }
+
+        // Filter Tanggal (dari)
+        if ($request->tanggal_dari) {
+            $query->where('tanggal_disetujui', '>=', $request->tanggal_dari);
+        }
+
+        // Filter Tanggal (sampai)
+        if ($request->tanggal_sampai) {
+            $query->where('tanggal_disetujui', '<=', $request->tanggal_sampai);
+        }
+
+        $laporan = $query->orderBy('tanggal_disetujui', 'desc')->get();
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('laporan.pdf', [
             'laporan' => $laporan,
