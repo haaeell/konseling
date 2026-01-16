@@ -86,7 +86,7 @@
                             @foreach ($laporan as $index => $row)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($row->tanggal_pengajuan)->translatedFormat('d F Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($row->tanggal_disetujui)->format('d-m-Y') }}</td>
                                     <td>{{ $row->siswa->user->name }}</td>
                                     <td>{{ $row->siswa->kelas->nama }}</td>
                                     <td>{{ $row->kategori_masalah_label }}</td>

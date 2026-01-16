@@ -12,7 +12,7 @@
                             <tr>
                                 <th>Siswa</th>
                                 <th>Tipe</th>
-                                <th>Tanggal Pengajuan</th>
+                                <th>Tanggal Konseling</th>
                                 <th>Deskripsi Permasalahan</th>
                                 <th>Status</th>
                                 <th>Rangkuman</th>
@@ -34,7 +34,7 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ \Carbon\Carbon::parse($jadwal->tanggal_pengajuan)->format('d-m-Y') }}</td>
+                                    <td>{{ $jadwal->tanggal_disetujui ? \Carbon\Carbon::parse($jadwal->tanggal_disetujui)->format('d-m-Y') : '-' }}</td>
                                     <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
                                     <td>
                                         <span
