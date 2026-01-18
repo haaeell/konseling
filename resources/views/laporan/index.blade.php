@@ -90,7 +90,7 @@
                                     <td>{{ $row->siswa->user->name }}</td>
                                     <td>{{ $row->siswa->kelas->nama }}</td>
                                     <td>
-                                        <small>{{ Str::limit($row->deskripsi_permasalahan, 40) }}</small>
+                                        <small>{{ $row->deskripsi_permasalahan }}</small>
                                         <br>
                                         @if ($row->kategori_masalah_label)
                                             <span class="badge bg-primary">
@@ -101,7 +101,7 @@
                                         @endif
                                     </td>
                                     <td><small>{{ $row->tempat ?? '-' }}</small></td>
-                                    <td><small>{{ Str::limit($row->rangkuman ?? '-', 40) }}</small></td>
+                                    <td><small>{{ $row->rangkuman ?? '-' }}</small></td>
                                     <td>{{ $row->nama_konselor ?? '-' }}</td>
                                     <td>
                                         <span class="badge {{ $row->status === 'selesai' ? 'bg-success' : ($row->status === 'ditolak' ? 'bg-danger' : ($row->status === 'disetujui' ? 'bg-info' : 'bg-warning')) }}">

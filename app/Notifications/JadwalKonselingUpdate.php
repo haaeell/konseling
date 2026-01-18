@@ -17,7 +17,6 @@ class JadwalKonselingUpdate extends Notification implements ShouldQueue
     public function __construct(PermohonanKonseling $permohonan)
     {
         $this->permohonan = $permohonan;
-        $this->delay = now()->addSeconds(2);
     }
 
     public function via($notifiable)
@@ -30,6 +29,7 @@ class JadwalKonselingUpdate extends Notification implements ShouldQueue
         return [
             'permohonan_id' => $this->permohonan->id,
             'siswa_name' => $this->permohonan->siswa->user->name,
+            'status' => $this->permohonan->status,
             'message' => "Jadwal konseling Anda telah diupdate",
             'jadwal' => $this->permohonan->tanggal_disetujui?->format('d-m-Y H:i'),
             'tempat' => $this->permohonan->tempat,

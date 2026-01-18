@@ -125,8 +125,10 @@
                                             <div>
                                                 <div class="fw-bold">Permohonan Konseling</div>
                                                 <small class="text-muted">{{ $notification->data['message'] }}</small>
+                                                @if(isset($notification->data['status']))
                                                 <div class="text-muted small">Status:
                                                     {{ ucfirst($notification->data['status']) }}</div>
+                                                @endif
                                             </div>
                                             <small
                                                 class="text-muted">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>

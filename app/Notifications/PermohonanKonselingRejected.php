@@ -17,7 +17,6 @@ class PermohonanKonselingRejected extends Notification implements ShouldQueue
     public function __construct(PermohonanKonseling $permohonan)
     {
         $this->permohonan = $permohonan;
-        $this->delay = now()->addSeconds(2);
     }
 
     public function via($notifiable)

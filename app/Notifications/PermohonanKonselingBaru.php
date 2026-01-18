@@ -17,7 +17,6 @@ class PermohonanKonselingBaru extends Notification implements ShouldQueue
     public function __construct(PermohonanKonseling $permohonan)
     {
         $this->permohonan = $permohonan;
-        $this->delay = now()->addSeconds(2); // Delay 2 detik untuk menghindari rate limiting
     }
 
     public function via($notifiable)

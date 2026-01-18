@@ -35,8 +35,8 @@
                                     </td>
 
                                     <td>{{ $jadwal->tanggal_disetujui ? \Carbon\Carbon::parse($jadwal->tanggal_disetujui)->format('d-m-Y') : '-' }}</td>
-                                    <td>{{ Str::limit($jadwal->deskripsi_permasalahan, 50) }}</td>
-                                    <td>{{ Str::limit($jadwal->rangkuman, 50) }}</td>
+                                    <td>{{ $jadwal->deskripsi_permasalahan }}</td>
+                                    <td>{{ $jadwal->rangkuman }}</td>
                                     <td>
                                         <span
                                             class="badge

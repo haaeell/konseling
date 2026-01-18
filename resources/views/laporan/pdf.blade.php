@@ -112,9 +112,9 @@
                     <td>{{ $row->tanggal_disetujui ? \Carbon\Carbon::parse($row->tanggal_disetujui)->format('d-m-Y') : '-' }}</td>
                     <td>{{ $row->siswa->user->name }}</td>
                     <td>{{ $row->siswa->kelas->nama }}</td>
-                    <td>{{ substr($row->deskripsi_permasalahan, 0, 50) }} ({{ $row->kategori_masalah_label ?? '-' }})</td>
+                    <td>{{ $row->deskripsi_permasalahan }} ({{ $row->kategori_masalah_label ?? '-' }})</td>
                     <td>{{ $row->tempat ?? '-' }}</td>
-                    <td>{{ substr($row->rangkuman ?? '-', 0, 50) }}</td>
+                    <td>{{ $row->rangkuman ?? '-' }}</td>
                     <td>{{ $row->nama_konselor ?? '-' }}</td>
                     <td class="center">{{ ucfirst($row->status) }}</td>
                 </tr>

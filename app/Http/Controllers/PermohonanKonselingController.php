@@ -9,10 +9,14 @@ use App\Models\PermohonanKriteria;
 use App\Models\Siswa;
 use App\Models\SubKriteria;
 use App\Notifications\PermohonanKonselingNotification;
-use App\Notifications\PermohonanKonselingApproved;
-use App\Notifications\PermohonanKonselingRejected;
-use App\Notifications\JadwalKonselingUpdate;
-use App\Notifications\PermohonanKonselingBaru;
+use App\Notifications\PermohonanKonselingBaruWeb;
+use App\Notifications\PermohonanKonselingBaruEmail;
+use App\Notifications\PermohonanKonselingApprovedWeb;
+use App\Notifications\PermohonanKonselingApprovedEmail;
+use App\Notifications\PermohonanKonselingRejectedWeb;
+use App\Notifications\PermohonanKonselingRejectedEmail;
+use App\Notifications\JadwalKonselingUpdateWeb;
+use App\Notifications\JadwalKonselingUpdateEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
@@ -147,7 +151,8 @@ class PermohonanKonselingController extends Controller
         // Notify guru BK tentang permohonan baru
         $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
         foreach ($guruBk as $guru) {
-            $guru->notify(new PermohonanKonselingBaru($permohonan));
+            $guru->notify(new PermohonanKonselingBaruWeb($permohonan));
+            $guru->notify(new PermohonanKonselingBaruEmail($permohonan));
         }
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil diajukan.');
@@ -169,11 +174,13 @@ class PermohonanKonselingController extends Controller
         ]);
 
         // Notify siswa tentang update jadwal
-        $permohonan->siswa->user->notify(new JadwalKonselingUpdate($permohonan));
+        $permohonan->siswa->user->notify(new JadwalKonselingUpdateWeb($permohonan));
+        $permohonan->siswa->user->notify(new JadwalKonselingUpdateEmail($permohonan));
 
         // Notify orangtua jika ada
         if ($permohonan->siswa->orangtua && $permohonan->siswa->orangtua->user) {
-            $permohonan->siswa->orangtua->user->notify(new JadwalKonselingUpdate($permohonan));
+            $permohonan->siswa->orangtua->user->notify(new JadwalKonselingUpdateWeb($permohonan));
+            $permohonan->siswa->orangtua->user->notify(new JadwalKonselingUpdateEmail($permohonan));
         }
 
         return back()->with('success', 'Jadwal konseling berhasil diperbarui.');
@@ -205,10 +212,12 @@ class PermohonanKonselingController extends Controller
                 ->first();
 
             if ($waliKelas && $waliKelas->user) {
-                $waliKelas->user->notify(new PermohonanKonselingApproved($permohonan));
+                $waliKelas->user->notify(new PermohonanKonselingApprovedWeb($permohonan));
+                $waliKelas->user->notify(new PermohonanKonselingApprovedEmail($permohonan));
             }
         } else {
-            $permohonan->siswa->user->notify(new PermohonanKonselingApproved($permohonan));
+            $permohonan->siswa->user->notify(new PermohonanKonselingApprovedWeb($permohonan));
+            $permohonan->siswa->user->notify(new PermohonanKonselingApprovedEmail($permohonan));
         }
         
         return redirect()->back()->with('success', 'Permohonan konseling berhasil disetujui.');
@@ -259,7 +268,8 @@ class PermohonanKonselingController extends Controller
         ]);
 
         // Notify siswa tentang penolakan
-        $permohonan->siswa->user->notify(new PermohonanKonselingRejected($permohonan));
+        $permohonan->siswa->user->notify(new PermohonanKonselingRejectedWeb($permohonan));
+        $permohonan->siswa->user->notify(new PermohonanKonselingRejectedEmail($permohonan));
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil ditolak.');
     }

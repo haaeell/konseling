@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PermohonanKonselingApproved extends Notification implements ShouldQueue
+class PermohonanKonselingRejectedEmail extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -21,26 +21,14 @@ class PermohonanKonselingApproved extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return ['database', 'mail'];
-    }
-
-    public function toDatabase($notifiable)
-    {
-        return [
-            'permohonan_id' => $this->permohonan->id,
-            'siswa_name' => $this->permohonan->siswa->user->name,
-            'status' => 'disetujui',
-            'message' => "Permohonan konseling Anda telah disetujui",
-            'action_url' => route('permohonan-konseling.index'),
-            'type' => 'permohonan_approved',
-        ];
+        return ['mail'];
     }
 
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Permohonan Konseling Disetujui')
-            ->view('emails.permohonan-approved', [
+            ->subject('Permohonan Konseling Ditolak')
+            ->view('emails.permohonan-rejected', [
                 'permohonan' => $this->permohonan,
                 'notifiable' => $notifiable,
             ]);
