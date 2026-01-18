@@ -36,7 +36,7 @@
                                 <td>{{ $s->user->name }}</td>
                                 <td>{{ $s->nisn }}</td>
                                 <td>{{ $s->kelas->nama }}</td>
-                                <td>{{ $s->nama_orangtua }}</td>
+                                <td>{{ optional($s->orangtua)->nama ?? '-' }}</td>
                                 <td>
                                     <button class="btn btn-sm btn-info" data-bs-toggle="modal"
                                         data-bs-target="#modalDetailSiswa{{ $s->id }}">
@@ -107,7 +107,7 @@
                                             <h6 class="mb-3">👨‍👩‍👦 Data Orangtua</h6>
                                             <div class="mb-2 d-flex">
                                                 <div class="fw-bold me-2" style="width:150px;">Nama</div>
-                                                <div> : {{ $s->nama_orangtua }}</div>
+                                                <div> : {{ optional($s->orangtua)->nama ?? '-' }}</div>
                                             </div>
                                             <div class="mb-2 d-flex">
                                                 <div class="fw-bold me-2" style="width:150px;">Email</div>

@@ -37,6 +37,11 @@ class PermohonanKonseling extends Model
         'bukti_masalah',
     ];
 
+    protected $casts = [
+        'tanggal_pengajuan' => 'datetime',
+        'tanggal_disetujui' => 'datetime',
+    ];
+
     // Relasi
     public function siswa()
     {

@@ -12,8 +12,6 @@ class Siswa extends Model
         'nis',
         'kelas_id',
         'jenis_kelamin',
-        'no_telp_orangtua',
-        'nama_orangtua',
         'alamat'
     ];
 

@@ -55,8 +55,6 @@ class UserController extends Controller
                 'nis' => $request->nis,
                 'kelas_id' => $request->kelas_id,
                 'jenis_kelamin' => $request->jenis_kelamin,
-                'no_telp_orangtua' => $request->no_telp_orangtua,
-                'nama_orangtua' => $request->nama_orangtua,
                 'alamat' => $request->alamat,
             ]);
 
@@ -131,8 +129,6 @@ class UserController extends Controller
                 'nis' => $request->nis,
                 'kelas_id' => $request->kelas_id,
                 'jenis_kelamin' => $request->jenis_kelamin,
-                'no_telp_orangtua' => $request->no_telp_orangtua,
-                'nama_orangtua' => $request->nama_orangtua,
                 'alamat' => $request->alamat,
             ]);
 

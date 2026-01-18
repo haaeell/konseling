@@ -58,8 +58,6 @@ class SISeeder extends Seeder
             'nis' => $nis,
             'kelas_id' => $kelasId,
             'jenis_kelamin' => 'P',
-            'nama_orangtua' => $namaOrtu,
-            'no_telp_orangtua' => '08123456789',
             'alamat' => 'Jl. Merdeka No. 10',
             'created_at' => now(),
             'updated_at' => now(),

@@ -56,8 +56,6 @@ class SiswaController extends Controller
             'nis' => $request->nis,
             'kelas_id' => $request->kelas_id,
             'jenis_kelamin' => $request->jenis_kelamin,
-            'nama_orangtua' => $request->nama_orangtua,
-            'no_telp_orangtua' => $request->no_telp_orangtua,
             'alamat' => $request->alamat,
         ]);
 
@@ -118,8 +116,6 @@ class SiswaController extends Controller
             'nis' => $request->nis,
             'kelas_id' => $request->kelas_id,
             'jenis_kelamin' => $request->jenis_kelamin,
-            'nama_orangtua' => $request->nama_orangtua,
-            'no_telp_orangtua' => $request->no_telp_orangtua,
             'alamat' => $request->alamat,
         ]);
 

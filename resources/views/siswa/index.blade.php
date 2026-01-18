@@ -54,26 +54,26 @@
                                     <td>{{ $s->nis }}</td>
                                     <td>{{ $s->kelas ? $s->kelas->nama : '-' }}</td>
                                     <td>{{ $s->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
-                                    <td>{{ $s->nama_orangtua }}</td>
-                                    <td>{{ $s->no_telp_orangtua }}</td>
+                                    <td>{{ optional($s->orangtua)->nama ?? '-' }}</td>
+                                    <td>{{ optional($s->orangtua)->no_hp ?? '-' }}</td>
                                     <td>{{ $s->alamat }}</td>
-                                    <td class="d-flex text-nowrap gap-2">
+                                    <td class="d-flex flex-column text-nowrap gap-2">
                                         <button class="btn btn-sm btn-warning edit-siswa" data-id="{{ $s->id }}"
                                             data-name="{{ $s->user->name }}" data-email="{{ $s->user->email }}"
                                             data-nisn="{{ $s->nisn }}" data-nis="{{ $s->nis }}"
                                             data-kelas_id="{{ $s->kelas_id }}"
                                             data-jenis_kelamin="{{ $s->jenis_kelamin }}"
-                                            data-nama_orangtua="{{ $s->nama_orangtua }}"
-                                            data-no_telp_orangtua="{{ $s->no_telp_orangtua }}"
+                                            data-nama_orangtua="{{ optional($s->orangtua)->nama }}"
+                                            data-no_telp_orangtua="{{ optional($s->orangtua)->no_hp }}"
                                             data-alamat="{{ $s->alamat }}" data-user_id="{{ $s->user_id }}"
-                                            data-hubungan_dengan_siswa="{{ $s->orangtua->first() ? $s->orangtua->first()->hubungan_dengan_siswa : '' }}"
+                                            data-hubungan_dengan_siswa="{{ optional($s->orangtua)->hubungan_dengan_siswa }}"
                                             data-bs-toggle="modal" data-bs-target="#siswaModal"><i class="bi bi-pencil"></i> Edit</button>
                                         <form action="{{ route('siswa.destroy', $s->id) }}" method="POST"
-                                            style="display:inline;"
+                                            style="display:inline; width: 100%;"
                                             onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i>
+                                            <button type="submit" class="btn btn-sm btn-danger w-100"><i class="bi bi-trash"></i>
                                                 Hapus</button>
                                         </form>
                                     </td>

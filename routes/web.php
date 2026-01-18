@@ -58,8 +58,16 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('permohonan-konseling/complete/{id}', [PermohonanKonselingController::class, 'complete'])->name('permohonan-konseling.complete');
 
     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-    Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
         ->name('notifications.read');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])
+        ->name('notifications.unreadCount');
+    Route::get('/notifications/recent', [NotificationController::class, 'getRecent'])
+        ->name('notifications.recent');
     Route::get('/laporan/pdf', [LaporanController::class, 'cetakPdf'])->name('laporan.pdf');
 
 

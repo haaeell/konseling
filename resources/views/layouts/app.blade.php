@@ -49,6 +49,18 @@
                                 </li>
                             @endif
                         @else
+                            <!-- Notification Bell -->
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="{{ route('notifications.index') }}" title="Notifikasi">
+                                    <i class="fas fa-bell"></i>
+                                    @if(Auth::user()->unreadNotifications()->count() > 0)
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ Auth::user()->unreadNotifications()->count() }}
+                                        </span>
+                                    @endif
+                                </a>
+                            </li>
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}

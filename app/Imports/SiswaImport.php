@@ -61,8 +61,6 @@ class SiswaImport implements ToModel, WithHeadingRow
             'nis' => $row['nis'],
             'kelas_id' => $kelas->id,
             'jenis_kelamin' => $row['jenis_kelamin'],
-            'nama_orangtua' => $row['nama_orangtua'],
-            'no_telp_orangtua' => $row['no_telp_orangtua'],
             'alamat' => $row['alamat'],
         ]);
 

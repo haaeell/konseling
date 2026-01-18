@@ -9,6 +9,10 @@ use App\Models\PermohonanKriteria;
 use App\Models\Siswa;
 use App\Models\SubKriteria;
 use App\Notifications\PermohonanKonselingNotification;
+use App\Notifications\PermohonanKonselingApproved;
+use App\Notifications\PermohonanKonselingRejected;
+use App\Notifications\JadwalKonselingUpdate;
+use App\Notifications\PermohonanKonselingBaru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
@@ -139,12 +143,11 @@ class PermohonanKonselingController extends Controller
         }
 
         $permohonan->update(array_merge(['skor_prioritas' => $totalSkor], $kriteriaLabels));
+        
+        // Notify guru BK tentang permohonan baru
         $guruBk = User::whereHas('guru', fn($q) => $q->where('role_guru', 'bk'))->get();
         foreach ($guruBk as $guru) {
-            $guru->notify(new PermohonanKonselingNotification(
-                $permohonan,
-                "$user->name mengajukan permohonan konseling."
-            ));
+            $guru->notify(new PermohonanKonselingBaru($permohonan));
         }
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil diajukan.');
@@ -165,20 +168,12 @@ class PermohonanKonselingController extends Controller
             'tempat' => $request->tempat,
         ]);
 
-        $pesan = 'Jadwal konseling Anda telah diperbarui. '
-            . 'Tanggal: ' . Carbon::parse($request->tanggal_disetujui)->format('d M Y')
-            . ', Tempat: ' . $request->tempat;
+        // Notify siswa tentang update jadwal
+        $permohonan->siswa->user->notify(new JadwalKonselingUpdate($permohonan));
 
-        Notification::send(
-            $permohonan->siswa->user,
-            new PermohonanKonselingNotification($permohonan, $pesan)
-        );
-
+        // Notify orangtua jika ada
         if ($permohonan->siswa->orangtua && $permohonan->siswa->orangtua->user) {
-            Notification::send(
-                $permohonan->siswa->orangtua->user,
-                new PermohonanKonselingNotification($permohonan, $pesan)
-            );
+            $permohonan->siswa->orangtua->user->notify(new JadwalKonselingUpdate($permohonan));
         }
 
         return back()->with('success', 'Jadwal konseling berhasil diperbarui.');
@@ -203,29 +198,19 @@ class PermohonanKonselingController extends Controller
             'nama_konselor' => Auth::user()->name,
         ]);
 
+        // Notify based on report type
         if ($permohonan->report_type === 'teacher') {
             $waliKelas = Guru::where('role_guru', 'walikelas')
                 ->where('kelas_id', $permohonan->siswa->kelas_id)
                 ->first();
 
             if ($waliKelas && $waliKelas->user) {
-                Notification::send(
-                    $waliKelas->user,
-                    new PermohonanKonselingNotification(
-                        $permohonan,
-                        'Permohonan konseling yang Anda ajukan telah disetujui oleh guru BK.'
-                    )
-                );
+                $waliKelas->user->notify(new PermohonanKonselingApproved($permohonan));
             }
         } else {
-            Notification::send(
-                $permohonan->siswa->user,
-                new PermohonanKonselingNotification(
-                    $permohonan,
-                    'Permohonan konseling Anda telah disetujui.'
-                )
-            );
+            $permohonan->siswa->user->notify(new PermohonanKonselingApproved($permohonan));
         }
+        
         return redirect()->back()->with('success', 'Permohonan konseling berhasil disetujui.');
     }
 
@@ -273,8 +258,8 @@ class PermohonanKonselingController extends Controller
             'alasan_penolakan' => $request->alasan_penolakan,
         ]);
 
-        $user = $permohonan->siswa->user;
-        Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah ditolak.'));
+        // Notify siswa tentang penolakan
+        $permohonan->siswa->user->notify(new PermohonanKonselingRejected($permohonan));
 
         return redirect()->back()->with('success', 'Permohonan konseling berhasil ditolak.');
     }
@@ -296,8 +281,7 @@ class PermohonanKonselingController extends Controller
             'nama_konselor' => Auth::user()->name,
         ]);
 
-        $user = $permohonan->siswa->user;
-        Notification::send($user, new PermohonanKonselingNotification($permohonan, 'Permohonan konseling Anda telah selesai.'));
+        // Tidak ada notifikasi saat complete - sudah notified saat approve
 
         return redirect()->back()->with('success', 'Permohonan konseling telah selesai.');
     }
